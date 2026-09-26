@@ -173,9 +173,16 @@ func TestPipelineM2WebAndSAN(t *testing.T) {
 	if !strings.Contains(logText, "san_expand_done") {
 		t.Errorf("缺少 SAN 联动完成事件:\n%s", logText)
 	}
-	// 绝不允许出现对越界域名的扫描动作
-	if strings.Contains(logText, `"event":"san_asset"`) && strings.Contains(logText, "out-of-scope.example") {
-		t.Errorf("越界域名被扫描了（严重问题）:\n%s", logText)
+	// 绝不允许出现对越界域名的扫描动作。
+	//
+	// 必须**逐行**判断：越界域名本身一定会出现在 san_rejected 的 reason 里，
+	// 而 san_asset 事件可能来自合法域名（例如 allow 内的 localhost）。
+	// 若用"整份日志里分别 Contains 两个串"的写法，只要合法扩展产出过一条资产事件，
+	// 就会把"合法扩展 + 越界被拒"误判成"越界被扫描" —— CI 上就是这么红的。
+	for _, line := range strings.Split(logText, "\n") {
+		if strings.Contains(line, `"event":"san_asset"`) && strings.Contains(line, "out-of-scope.example") {
+			t.Errorf("越界域名被扫描了（严重问题）:\n%s", line)
+		}
 	}
 }
 
