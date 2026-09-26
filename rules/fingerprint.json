@@ -1,0 +1,61 @@
+[
+  {
+    "name": "OpenSSH",
+    "service": "ssh",
+    "ports": [22, 2222],
+    "banner_regex": ["^SSH-[12]\\.[0-9]+-OpenSSH", "OpenSSH[_-][0-9.p]+"],
+    "confidence": "medium"
+  },
+  {
+    "name": "Redis",
+    "service": "redis",
+    "ports": [6379, 6380],
+    "banner_regex": ["(?i)redis", "-ERR unknown command", "-DENIED"]
+  },
+  {
+    "name": "RDP",
+    "service": "rdp",
+    "ports": [3389],
+    "confidence": "low"
+  },
+  {
+    "name": "Nginx",
+    "service": "http",
+    "header_regex": { "server": "(?i)nginx" }
+  },
+  {
+    "name": "Apache Tomcat",
+    "service": "http",
+    "title_regex": ["(?i)apache tomcat"],
+    "body_regex": ["Apache Tomcat/[0-9]"]
+  },
+  {
+    "name": "Jenkins",
+    "service": "http",
+    "header_regex": { "x-jenkins": "[0-9]" },
+    "title_regex": ["(?i)jenkins"]
+  },
+  {
+    "name": "Nacos",
+    "service": "http",
+    "title_regex": ["(?i)nacos"],
+    "body_regex": ["console-ui", "nacos"]
+  },
+  {
+    "name": "Spring Boot Actuator",
+    "service": "http",
+    "body_regex": ["\"_links\"", "\"status\"\\s*:\\s*\"UP\""]
+  },
+  {
+    "name": "示例-按 favicon 指纹识别自研系统（把 mmh3 换成实际抓到的值）",
+    "service": "http",
+    "favicon_hash": [-247388890, 116323288],
+    "confidence": "medium"
+  },
+  {
+    "name": "示例-临时停用的规则（enabled:false 即不生效，无需删掉整条）",
+    "service": "http",
+    "body_regex": ["legacy-marker"],
+    "enabled": false
+  }
+]

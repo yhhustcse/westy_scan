@@ -1,0 +1,91 @@
+# CI：与 scripts/verify.ps1 等价的流水线
+#
+# 诚实标注：这份 workflow 是在**离线环境**里写的，没有在 GitHub 上实跑验证过。
+# 它调用的命令与本地 scripts/verify.ps1 完全一致，而那套命令在本地执行结果为
+# "0 个失败步骤"（日志 out/verify.log）。首次 push 后如有问题，按报错微调即可。
+#
+# 零第三方依赖：不需要 GOPROXY（默认 off 也能构建），没有 go.sum。
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # 只对项目范围跑 gofmt：对仓库根跑会走进 .tools/go 的工具链源码
+      - name: gofmt 检查（仅 Linux，避免换行符差异）
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          bad=$(gofmt -l cmd internal)
+          if [ -n "$bad" ]; then
+            echo "以下文件未格式化："
+            echo "$bad"
+            exit 1
+          fi
+          echo "gofmt 干净"
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: go build ./...
+
+      - name: go test（含竞态检测）
+        run: go test ./... -count=1 -race
+
+      - name: 构建单二进制
+        run: go build -trimpath -ldflags "-s -w" -o bin/westy ./cmd/westy
+
+      - name: 规则库规模（指纹规则 / 漏洞模板）
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          echo "指纹规则: $(./bin/westy -list-rules | grep -c '"name"') 条"
+          echo "漏洞模板: $(./bin/westy -list-templates 2>/dev/null | grep -c '"id"') 条"
+
+  cross-build:
+    name: 交叉编译 / ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux/amd64, linux/arm64, windows/amd64, darwin/arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: GOOS/GOARCH 构建
+        shell: bash
+        run: |
+          export GOOS="${TARGET%/*}" GOARCH="${TARGET#*/}"
+          out="$(mktemp -d)/westy"
+          go build -trimpath -ldflags "-s -w" -o "$out" ./cmd/westy
+          echo "ok $TARGET"
+        env:
+          TARGET: ${{ matrix.target }}

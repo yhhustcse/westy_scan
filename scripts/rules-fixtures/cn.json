@@ -1,0 +1,459 @@
+[
+  {
+    "template_id": "weaver-ecology-wui-exposure",
+    "note": "泛微 e-cology /wui/index.html：只下发 JSESSIONID，页面本身无登录表单",
+    "path": "/wui/index.html",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Server": "Apache-Coyote/1.1",
+      "Set-Cookie": "JSESSIONID=9F3A7C21B0E45D68; Path=/wui; HttpOnly"
+    },
+    "body": "<!DOCTYPE html><html><head><title>门户</title><link rel=\"stylesheet\" href=\"/wui/theme/ecology8/page/login.css\"></head><body></body></html>"
+  },
+  {
+    "template_id": "weaver-eoffice-panel-exposure",
+    "note": "泛微 e-office 登录面板",
+    "path": "/eoffice/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Server": "Apache-Coyote/1.1",
+      "Set-Cookie": "ECOM_JSESSIONID=2B7C91E0; Path=/eoffice; HttpOnly"
+    },
+    "body": "<!DOCTYPE html><html><head><title>泛微 e-office 协同办公系统</title></head><body><form action=\"/eoffice/login/verifyLogin.php\" method=\"post\"></form><script src=\"/eoffice/static/js/jquery.min.js\"></script></body></html>"
+  },
+  {
+    "template_id": "seeyon-oa-panel-exposure",
+    "note": "致远 A8 /seeyon/ 登录面板",
+    "path": "/seeyon/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Server": "Apache-Coyote/1.1",
+      "Set-Cookie": "JSESSIONID=A1B2C3D4E5F60718; Path=/seeyon; HttpOnly"
+    },
+    "body": "<!DOCTYPE html><html><head><title>致远A8协同管理软件</title></head><body><script src=\"/seeyon/ajax-lib/jquery.min.js\"></script><form id=\"loginForm\"></form></body></html>"
+  },
+  {
+    "template_id": "landray-ekp-panel-exposure",
+    "note": "蓝凌 EKP 登录面板",
+    "path": "/ekp/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=77E1A2B3C4D5E6F7; Path=/ekp; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>蓝凌EKP</title></head><body><link href=\"/ekp/sys/ui/extend/jquery/jquery-ui.css\"><form></form></body></html>"
+  },
+  {
+    "template_id": "tongda-oa-login-code-exposure",
+    "note": "通达 OA ispirit 登录页（此处返回一份静态表单片段，代表页面可未授权访问）",
+    "path": "/ispirit/login_code.php",
+    "status": 200,
+    "content_type": "text/html; charset=gbk",
+    "headers": { "Set-Cookie": "PHPSESSID=5d41c8ab9e0f2d7a6b3c1e4f; path=/" },
+    "body": "<html><head><title>通达OA - 用户登录</title></head><body><script src=\"/ispirit/js/ispirit.js\"></script><div id=\"MYOA_login\"></div></body></html>"
+  },
+  {
+    "template_id": "huatian-oa-panel-exposure",
+    "note": "华天动力 OA 门户。靶站按 path 精确匹配且不跟随跳转，因此这里直接给跳转后的登录页响应（真实环境是先 302 再 200）",
+    "path": "/OA/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=1122334455667788; Path=/OA; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>华天动力协同办公系统</title></head><body><form action=\"/OA/loginAction.do\"></form></body></html>"
+  },
+  {
+    "template_id": "yonyou-nc-portal-exposure",
+    "note": "用友 NC /portal/ 登录页",
+    "path": "/portal/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Server": "Apache-Coyote/1.1",
+      "Set-Cookie": "JSESSIONID=CAFEBABE00001111; Path=/; HttpOnly"
+    },
+    "body": "<!DOCTYPE html><html><head><title>用友NC Cloud 门户</title></head><body><link href=\"/nc/servlet/ncstyle.css\"><form></form></body></html>"
+  },
+  {
+    "template_id": "yonyou-yonsuite-panel-exposure",
+    "note": "用友 YonSuite SSO 登录入口",
+    "path": "/iuap-sso/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "iuap_sso_session=8f7e6d5c4b3a2910; Path=/iuap-sso; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>YonSuite 登录</title></head><body><script src=\"/iuap-sso/js/login.js\"></script><div class=\"yonbip-brand\"></div></body></html>"
+  },
+  {
+    "template_id": "kingdee-eas-panel-exposure",
+    "note": "金蝶 EAS 管理控制台",
+    "path": "/eas/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=EAS000011112222; Path=/eas; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>Kingdee EAS 管理控制台</title></head><body><script src=\"/eas/portal/js/login.js\"></script><span>kingdee</span></body></html>"
+  },
+  {
+    "template_id": "kingdee-k3cloud-panel-exposure",
+    "note": "金蝶 K3Cloud 登录页",
+    "path": "/K3Cloud/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "ASP.NET_SessionId=abcd1234efgh5678; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>金蝶K/3 Cloud</title></head><body><script src=\"/K3Cloud/Content/js/K3CloudLogin.js\"></script></body></html>"
+  },
+  {
+    "template_id": "inspur-gs-panel-exposure",
+    "note": "浪潮 GS 管理端登录页",
+    "path": "/GS/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=GS99001122334455; Path=/GS; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>浪潮GS管理软件</title></head><body><a href=\"/GS/login.jsp\"></a></body></html>"
+  },
+  {
+    "template_id": "sap-netweaver-portal-exposure",
+    "note": "SAP NetWeaver Portal 未授权访问 /irj/portal 时下发 SAP_SESSIONID 并跳转登录",
+    "path": "/irj/portal",
+    "status": 302,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Set-Cookie": "SAP_SESSIONID_JPR_800=abcdefghijklmnop; path=/; HttpOnly",
+      "Location": "/irj/portal?NavigationTarget=navurl://logon"
+    },
+    "body": "<html><head><title>SAP NetWeaver Portal</title></head><body></body></html>"
+  },
+  {
+    "template_id": "dameng-dmweb-console-exposure",
+    "note": "达梦 DMWeb 管理端",
+    "path": "/dameng/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=DM0011223344556677; Path=/dameng; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>达梦数据库 DMWeb 管理平台</title></head><body><form action=\"/dameng/login\"></form></body></html>"
+  },
+  {
+    "template_id": "kingbase-web-console-exposure",
+    "note": "人大金仓 KingbaseES 管理端",
+    "path": "/kingbase/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=KB1122334455667788; Path=/kingbase; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>KingbaseES Web 管理工具</title></head><body><form></form></body></html>"
+  },
+  {
+    "template_id": "oceanbase-ocp-console-exposure",
+    "note": "OceanBase OCP 控制台",
+    "path": "/ocp/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "ocp_session=0a1b2c3d4e5f; Path=/ocp; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>OceanBase 云平台</title></head><body><script src=\"/ocp/static/js/ocp-login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "tidb-dashboard-exposure",
+    "note": "TiDB Dashboard 索引页",
+    "path": "/dashboard/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "X-Frame-Options": "DENY" },
+    "body": "<!DOCTYPE html><html><head><title>TiDB Dashboard</title></head><body><div id=\"tidb-dashboard\"></div></body></html>"
+  },
+  {
+    "template_id": "tongweb-console-exposure",
+    "note": "东方通 TongWeb 控制台",
+    "path": "/tongweb/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "TongWeb", "Set-Cookie": "JSESSIONID=TW4455667788990011; Path=/tongweb; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>TongWeb 管理控制台</title></head><body><form action=\"/tongweb/console/login\"></form></body></html>"
+  },
+  {
+    "template_id": "bes-console-exposure",
+    "note": "宝兰德 BES 控制台",
+    "path": "/bes/console/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "BES/9.5", "Set-Cookie": "JSESSIONID=BES2233445566778899; Path=/bes; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>宝兰德 BES 应用服务器控制台</title></head><body></body></html>"
+  },
+  {
+    "template_id": "inforSuite-console-exposure",
+    "note": "中创 InforSuite AS 控制台",
+    "path": "/inforSuite/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "InforSuite", "Set-Cookie": "JSESSIONID=IS3344556677889900; Path=/inforSuite; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>InforSuite 管理控制台</title></head><body></body></html>"
+  },
+  {
+    "template_id": "huawei-esight-panel-exposure",
+    "note": "华为 eSight 网管登录页",
+    "path": "/eSight/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "eSightSession=aa11bb22cc33; Path=/eSight; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>Huawei eSight</title></head><body><script src=\"/eSight/theme/default/js/login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "h3c-imc-panel-exposure",
+    "note": "H3C iMC 网管登录页",
+    "path": "/imc/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=IMC5566778899001122; Path=/imc; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>H3C iMC 智能管理中心</title></head><body><link href=\"/imc/css/login.css\"></body></html>"
+  },
+  {
+    "template_id": "ruijie-riil-panel-exposure",
+    "note": "锐捷 RIIL 运维平台登录页",
+    "path": "/RIIL/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "RIIL_SESSION=dd44ee55ff66; Path=/RIIL; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>锐捷 RIIL 综合运维管理平台</title></head><body></body></html>"
+  },
+  {
+    "template_id": "sangfor-ac-panel-exposure",
+    "note": "深信服 AC 管理面板。靶站按 path 精确匹配且不跟随跳转，直接给登录页响应",
+    "path": "/ac/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "TWFID=aa11bb22cc33dd44; Path=/ac; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>深信服 AC 上网行为管理</title></head><body><form action=\"/ac/login\"></form></body></html>"
+  },
+  {
+    "template_id": "sangfor-af-panel-exposure",
+    "note": "深信服 AF 管理面板。靶站按 path 精确匹配且不跟随跳转，直接给登录页响应",
+    "path": "/af/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "TWFID=ff66aa77bb88cc99; Path=/af; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>深信服下一代防火墙 AF</title></head><body><form action=\"/af/login\"></form></body></html>"
+  },
+  {
+    "template_id": "manageengine-opmanager-api-exposure",
+    "note": "OpManager 前端配置接口未授权可读",
+    "path": "/apiclient/ember",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "headers": { "Server": "ManageEngine OpManager" },
+    "body": "{\"product\":\"OpManager\",\"client\":\"ember\",\"buildVersion\":\"12.5.238\"}"
+  },
+  {
+    "template_id": "solarwinds-orion-login-exposure",
+    "note": "SolarWinds Orion 登录页",
+    "path": "/Orion/Login.aspx",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "ASP.NET_SessionId=orion1234567890; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>Orion Platform Login</title></head><body><form action=\"/Orion/Login.aspx\"></form><script src=\"/Orion/WebResource.axd\"></script><span>SolarWinds</span></body></html>"
+  },
+  {
+    "template_id": "prtg-web-panel-exposure",
+    "note": "PRTG 面板登录页",
+    "path": "/index.htm",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "PRTG_SESSION=99aa88bb77cc66dd; Path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>PRTG Network Monitor</title></head><body><span>Paessler</span></body></html>"
+  },
+  {
+    "template_id": "jumpserver-panel-exposure",
+    "note": "JumpServer 堡垒机登录页",
+    "path": "/core/auth/login/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "sessionid=jms1234567890abcdef; Path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>JumpServer</title></head><body><form action=\"/core/auth/login/\" method=\"post\"></form></body></html>"
+  },
+  {
+    "template_id": "shterm-bastion-panel-exposure",
+    "note": "齐治堡垒机登录页",
+    "path": "/shterm/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=STYY1122334455; Path=/shterm; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>齐治堡垒机</title></head><body><script src=\"/shterm/js/shterm_login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "cloudbility-bastion-panel-exposure",
+    "note": "行云管家堡垒机登录页",
+    "path": "/cloudbility/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "JSESSIONID=CB99887766554433; Path=/cloudbility; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>行云管家堡垒机</title></head><body><script src=\"/cloudbility/static/login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "hikvision-device-login-exposure",
+    "note": "海康威视设备 Web 管理口登录页",
+    "path": "/doc/page/login.asp",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "WebSession=4a5b6c7d8e9f; path=/" },
+    "body": "<!DOCTYPE html><html><head><title>Hikvision 设备登录</title></head><body><script src=\"/doc/page/js/login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "hikvision-isapi-devinfo-exposure",
+    "note": "海康 ISAPI deviceInfo 未授权读取（只读 GET）",
+    "path": "/ISAPI/System/deviceInfo",
+    "status": 200,
+    "content_type": "application/xml; charset=utf-8",
+    "headers": { "Server": "webs" },
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<DeviceInfo xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><deviceName>IPCamera</deviceName><deviceID>88</deviceID><model>DS-2CD2T47</model><serialNumber>DS-2CD2T47G2-L20250101AAWR123456789</serialNumber><macAddress>44:19:b6:12:34:56</macAddress><firmwareVersion>V5.7.3</firmwareVersion></DeviceInfo>"
+  },
+  {
+    "template_id": "dahua-current-config-exposure",
+    "note": "大华 current_config 未授权可达（只读 GET，不做任何配置写入）",
+    "path": "/current_config/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "DhWebSession=1a2b3c4d5e6f; path=/" },
+    "body": "<!DOCTYPE html><html><head><title>Dahua Device Configuration</title></head><body><a href=\"/current_config/DeviceType\">current_config</a></body></html>"
+  },
+  {
+    "template_id": "dahua-rpc2-login-exposure",
+    "note": "大华 RPC2 登录页",
+    "path": "/RPC2_Login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "DhWebSession=9f8e7d6c5b4a; path=/" },
+    "body": "<!DOCTYPE html><html><head><title>Dahua 设备登录</title></head><body><form action=\"/RPC2_Login\" method=\"post\"></form></body></html>"
+  },
+  {
+    "template_id": "uniview-device-login-exposure",
+    "also_serves": ["hillstone-panel-exposure"],
+    "note": "宇视与山石都用 /login.php（路径冲突，按验收规则合并为一条夹具）。body 内同时携带两者各自的专有特征，status/Set-Cookie 也同时满足两边匹配器。",
+    "path": "/login.php",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "uniview_session=aa11bb22cc33; hillstone_sid=dd44ee55ff66; path=/" },
+    "body": "<!DOCTYPE html><html><head><title>Uniview 设备登录</title></head><body><script src=\"/LAPI/login.js\"></script><span>宇视</span><div id=\"hillstone-login\"><!-- Hillstone 山石网科 --></div></body></html>"
+  },
+  {
+    "template_id": "axis-cgi-panel-exposure",
+    "note": "Axis axis-cgi 管理入口",
+    "path": "/axis-cgi/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "AXIS 10.9 (Linux)" },
+    "body": "<!DOCTYPE html><html><head><title>AXIS Device Management</title></head><body><a href=\"/axis-cgi/admin/param.cgi\">axis-cgi</a></body></html>"
+  },
+  {
+    "template_id": "dvr-nvr-web-panel-exposure",
+    "note": "DVR/NVR 通用 Web 面板",
+    "path": "/DVR.htm",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "DVR WebServer" },
+    "body": "<!DOCTYPE html><html><head><title>DVR Web Client</title></head><body><script src=\"/js/dvr.js\"></script><div>NVR</div></body></html>"
+  },
+  {
+    "template_id": "fortinet-fortigate-panel-exposure",
+    "note": "FortiGate 管理界面登录页",
+    "path": "/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "xxxxxxxx-xxxxx" },
+    "body": "<!DOCTYPE html><html><head><title>FortiGate</title></head><body><form action=\"/login?redir=/ng\"></form><script>var fgt_lang = 'en';</script></body></html>"
+  },
+  {
+    "template_id": "paloalto-globalprotect-panel-exposure",
+    "note": "GlobalProtect 门户登录页",
+    "path": "/global-protect/login.esp",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "PHPSESSID=gp1234567890abcdef; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>GlobalProtect Portal</title></head><body><script src=\"/global-protect/js/pan.js\"></script><span>Palo Alto Networks</span></body></html>"
+  },
+  {
+    "template_id": "sonicwall-auth-panel-exposure",
+    "note": "SonicWall 管理登录页",
+    "path": "/auth1.html",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "SonicWall_session=1234abcd; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>SonicWall</title></head><body><form name=\"auth1.html\" action=\"/auth1.html\"></form></body></html>"
+  },
+  {
+    "template_id": "cisco-asa-login-exposure",
+    "note": "Cisco ASA WebVPN 登录页",
+    "path": "/+CSCOE+/logon.html",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Cisco ASA" },
+    "body": "<!DOCTYPE html><html><head><title>Cisco WebVPN</title></head><body><script src=\"/+CSCOE+/include/nav.js\"></script><form action=\"/+CSCOE+/logon.html\"></form></body></html>"
+  },
+  {
+    "template_id": "f5-bigip-tmui-exposure",
+    "note": "F5 BIG-IP TMUI 登录页",
+    "path": "/tmui/login.jsp",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "F5_ST=1a2b3c4d5e6f; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>BIG-IP logout page</title></head><body><form action=\"/tmui/login.jsp\"></form><span>F5 Networks</span></body></html>"
+  },
+  {
+    "template_id": "citrix-netscaler-vpn-exposure",
+    "note": "Citrix NetScaler VPN 门户",
+    "path": "/vpn/index.html",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "NSC_AAAC=abcdef0123456789; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>NetScaler Gateway</title></head><body><script src=\"/vpn/js/ns_gui_login.js\"></script></body></html>"
+  },
+  {
+    "template_id": "sangfor-ssl-vpn-panel-exposure",
+    "note": "深信服 SSL VPN 登录页",
+    "path": "/por/login_psw.csp",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "TWFID=svpn1122334455; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>深信服 SSL VPN</title></head><body><input name=\"svpn_name\"><span>Sangfor</span></body></html>"
+  },
+  {
+    "template_id": "array-networks-sslvpn-exposure",
+    "note": "Array Networks SSL VPN 门户",
+    "path": "/prx/000/http/localhost/login",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "ANsession=9988776655443322; path=/prx; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>Array Networks SSL VPN</title></head><body><form action=\"/prx/000/http/localhost/login\"></form></body></html>"
+  },
+  {
+    "template_id": "synology-dsm-panel-exposure",
+    "note": "群晖 DSM 管理入口：302 到登录页并下发 DSM 专有 Cookie",
+    "path": "/webman/index.cgi",
+    "status": 302,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Location": "/webman/index.cgi", "Set-Cookie": "id=AbCdEf123456; path=/; HttpOnly" },
+    "body": "<html><head><title>Synology DiskStation</title></head><body>DSM</body></html>"
+  },
+  {
+    "template_id": "qnap-qts-panel-exposure",
+    "note": "威联通 QNAP QTS 管理入口",
+    "path": "/cgi-bin/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "QMS_SID=qnap1234567890; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>QNAP QTS</title></head><body><form action=\"/cgi-bin/authLogin.cgi\"></form></body></html>"
+  },
+  {
+    "template_id": "hp-printer-ews-exposure",
+    "note": "HP 打印机 EWS 首页",
+    "path": "/hp/device/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "HP HTTP Server" },
+    "body": "<!DOCTYPE html><html><head><title>HP LaserJet M404dn</title></head><body><link href=\"/hp/device/css/style.css\"><span>HP Embedded Web Server</span></body></html>"
+  },
+  {
+    "template_id": "truenas-webui-exposure",
+    "note": "TrueNAS WebUI（这里模拟未开启强制登录时的界面可达 + 版本泄露）",
+    "path": "/ui/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Set-Cookie": "sessionid=truenas1234567890; path=/; HttpOnly" },
+    "body": "<!DOCTYPE html><html><head><title>TrueNAS 13.0-U5</title></head><body><script src=\"/ui/assets/index.js\"></script></body></html>"
+  }
+]

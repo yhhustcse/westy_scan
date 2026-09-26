@@ -1,0 +1,472 @@
+[
+  {
+    "template_id": "actuator-heapdump-exposure",
+    "path": "/actuator/heapdump",
+    "status": 200,
+    "content_type": "application/octet-stream",
+    "headers": { "Server": "nginx/1.24.0", "X-Application-Context": "application:8080" },
+    "body": "JAVA PROFILE 1.0.2\u0000\u0000\u0000\u0000HPROF-heap-dump-payload-Spring-Boot-Actuator"
+  },
+  {
+    "template_id": "actuator-mappings-exposure",
+    "path": "/actuator/mappings",
+    "content_type": "application/vnd.spring-boot.actuator.v3+json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"contexts\":{\"application\":{\"mappings\":{\"dispatcherServlets\":{\"dispatcherServlet\":[{\"handler\":\"com.example.demo.UserController#list()\",\"predicate\":\"{GET [/api/users]}\",\"details\":{\"handlerMethod\":{\"className\":\"com.example.demo.UserController\",\"name\":\"list\"}}}]},\"servletFilters\":[]}},\"parentId\":null}}"
+  },
+  {
+    "template_id": "actuator-beans-exposure",
+    "path": "/actuator/beans",
+    "content_type": "application/vnd.spring-boot.actuator.v3+json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"contexts\":{\"application\":{\"beans\":{\"basicErrorController\":{\"scope\":\"singleton\",\"type\":\"org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController\",\"resource\":\"class path resource [org/springframework/boot/autoconfigure/web/servlet/error/BasicErrorController.class]\",\"dependencies\":[\"errorAttributes\",\"errorViewResolvers\"]}},\"parentId\":null}}}"
+  },
+  {
+    "template_id": "actuator-configprops-exposure",
+    "path": "/actuator/configprops",
+    "content_type": "application/vnd.spring-boot.actuator.v3+json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"contexts\":{\"application\":{\"beans\":{\"spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties\":{\"prefix\":\"spring.datasource\",\"properties\":{\"url\":\"jdbc:mysql://127.0.0.1:3306/appdb\",\"username\":\"appuser\",\"password\":\"******\"},\"inputs\":{\"url\":{\"origin\":\"class path resource [application.yml] - 12:16\"}}}},\"parentId\":null}}}"
+  },
+  {
+    "template_id": "actuator-threaddump-exposure",
+    "path": "/actuator/threaddump",
+    "content_type": "application/vnd.spring-boot.actuator.v3+json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"threads\":[{\"threadName\":\"http-nio-8080-exec-1\",\"threadId\":42,\"blockedTime\":-1,\"blockedCount\":0,\"waitedTime\":-1,\"waitedCount\":3,\"lockName\":null,\"lockOwnerId\":-1,\"daemon\":true,\"priority\":5,\"stackTrace\":[{\"classLoaderName\":null,\"moduleName\":\"java.base\",\"moduleVersion\":\"17.0.2\",\"methodName\":\"park\",\"fileName\":\"Unsafe.java\",\"lineNumber\":-2,\"className\":\"jdk.internal.misc.Unsafe\",\"nativeMethod\":true}],\"suspended\":false,\"threadState\":\"WAITING\",\"inNative\":false}]}"
+  },
+  {
+    "template_id": "spring-cloud-gateway-routes-exposure",
+    "path": "/actuator/gateway/routes",
+    "content_type": "application/vnd.spring-boot.actuator.v3+json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "[{\"route_id\":\"order-service\",\"route_definition\":{\"id\":\"order-service\",\"uri\":\"lb://order-service\",\"order\":0,\"predicates\":[{\"name\":\"Path\",\"args\":{\"_genkey_0\":\"/order/**\"}}],\"filters\":[]},\"order\":0}]"
+  },
+  {
+    "template_id": "jolokia-list-exposure",
+    "path": "/jolokia/list",
+    "content_type": "application/json",
+    "headers": { "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "{\"request\":{\"type\":\"list\"},\"value\":{\"java.lang\":{\"name=Memory\":{\"attribute\":\"ObjectName\",\"description\":\"java.lang:name=Memory\",\"rw\":false,\"type\":\"javax.management.ObjectName\"},\"type=Memory\":{\"attr\":{\"HeapMemoryUsage\":{\"rw\":true}}}},\"java.util.logging\":{\"name=Logging\":{\"description\":\"java.util.logging:name=Logging\",\"rw\":false,\"type\":\"javax.management.ObjectName\"}}},\"status\":200}"
+  },
+  {
+    "template_id": "druid-monitor-index-exposure",
+    "path": "/druid/index.html",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<html><head><title>Druid Stat Index</title></head><body><div id=\"druid-stat-index\"><table><tr><td><a href=\"datasource.html\">datasource</a></td><td><a href=\"sql.html\">sql</a></td></tr></table></div></body></html>"
+  },
+  {
+    "template_id": "druid-sql-monitor-exposure",
+    "path": "/druid/sql.html",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<html><head><title>Druid Stat SQL</title></head><body><h2>Slow SQL</h2><table><tr><td><a href=\"sql.html\">SQL</a></td></tr></table></body></html>"
+  },
+  {
+    "template_id": "springfox-v2-api-docs-exposure",
+    "path": "/v2/api-docs",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"swagger\":\"2.0\",\"info\":{\"description\":\"Api Documentation\",\"version\":\"1.0.0\",\"title\":\"User Service API\"},\"host\":\"localhost:8080\",\"basePath\":\"/\",\"tags\":[{\"name\":\"user-controller\",\"description\":\"User Controller\"}],\"paths\":{\"/api/users\":{\"get\":{\"tags\":[\"user-controller\"],\"summary\":\"list\",\"operationId\":\"listUsingGET\",\"responses\":{\"200\":{\"description\":\"OK\",\"schema\":{\"$ref\":\"#/definitions/User\"}}}}}},\"definitions\":{\"User\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\",\"format\":\"int64\"}}}}}"
+  },
+  {
+    "template_id": "springdoc-v3-api-docs-exposure",
+    "path": "/v3/api-docs",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"openapi\":\"3.0.1\",\"info\":{\"title\":\"OpenAPI definition\",\"version\":\"v0\"},\"servers\":[{\"url\":\"http://localhost:8080\",\"description\":\"Generated server url\"}],\"paths\":{\"/api/ping\":{\"get\":{\"tags\":[\"ping-controller\"],\"operationId\":\"ping\",\"responses\":{\"200\":{\"description\":\"OK\"}}}}},\"components\":{}}"
+  },
+  {
+    "template_id": "swagger-ui-index-exposure",
+    "path": "/swagger-ui/index.html",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<!DOCTYPE html><html><head><title>Swagger UI</title><link rel=\"stylesheet\" href=\"./swagger-ui.css\"></head><body><div id=\"swagger-ui\"></div><script src=\"./swagger-ui-bundle.js\"></script><script>window.ui = SwaggerUIBundle({url: \"/v3/api-docs\", dom_id: \"#swagger-ui\"});</script></body></html>"
+  },
+  {
+    "template_id": "graphql-introspection-exposure",
+    "path": "/graphql",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"data\":{\"__schema\":{\"queryType\":{\"name\":\"Query\"},\"mutationType\":null,\"subscriptionType\":null,\"types\":[{\"kind\":\"OBJECT\",\"name\":\"Query\",\"fields\":[{\"name\":\"user\",\"args\":[{\"name\":\"id\",\"type\":{\"kind\":\"SCALAR\",\"name\":\"ID\"}}]}]}]}}}"
+  },
+  {
+    "template_id": "elasticsearch-cluster-health-exposure",
+    "path": "/_cluster/health",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "X-Elastic-Product": "Elasticsearch" },
+    "body": "{\"cluster_name\":\"westy-es\",\"status\":\"yellow\",\"timed_out\":false,\"number_of_nodes\":1,\"number_of_data_nodes\":1,\"active_primary_shards\":3,\"active_shards\":3,\"relocating_shards\":0,\"initializing_shards\":0,\"unassigned_shards\":0,\"delayed_unassigned_shards\":0,\"number_of_pending_tasks\":0,\"number_of_in_flight_fetch\":0,\"task_max_waiting_in_queue_millis\":0,\"active_shards_percent_as_number\":100.0}"
+  },
+  {
+    "template_id": "elasticsearch-nodes-info-exposure",
+    "path": "/_nodes",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "X-Elastic-Product": "Elasticsearch" },
+    "body": "{\"_nodes\":{\"total\":1,\"successful\":1,\"failed\":0},\"cluster_name\":\"westy-es\",\"nodes\":{\"node-1\":{\"name\":\"node-1\",\"transport_address\":\"127.0.0.1:9300\",\"host\":\"127.0.0.1\",\"ip\":\"127.0.0.1\",\"version\":\"7.17.9\",\"build_flavor\":\"default\",\"roles\":[\"data\",\"master\"]}}}"
+  },
+  {
+    "template_id": "elasticsearch-search-api-exposure",
+    "path": "/_search",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "X-Elastic-Product": "Elasticsearch" },
+    "body": "{\"took\":1,\"timed_out\":false,\"_shards\":{\"total\":1,\"successful\":1,\"skipped\":0,\"failed\":0},\"hits\":{\"total\":{\"value\":2,\"relation\":\"eq\"},\"max_score\":1.0,\"hits\":[{\"_index\":\"users\",\"_type\":\"_doc\",\"_id\":\"1\",\"_score\":1.0,\"_source\":{\"username\":\"admin\"}}]}}"
+  },
+  {
+    "template_id": "solr-admin-cores-exposure",
+    "path": "/solr/admin/cores",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "{\"responseHeader\":{\"status\":0,\"QTime\":1},\"initFailures\":{},\"status\":{\"gettingstarted\":{\"name\":\"gettingstarted\",\"instanceDir\":\"/opt/solr/server/solr/gettingstarted\",\"dataDir\":\"/opt/solr/server/solr/gettingstarted/data\",\"config\":\"solrconfig.xml\",\"schema\":\"managed-schema\",\"startTime\":\"2023-01-01T00:00:00.000Z\",\"uptime\":123456}}}"
+  },
+  {
+    "template_id": "hadoop-namenode-jmx-exposure",
+    "path": "/jmx",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "{\"beans\":[{\"name\":\"Hadoop:service=NameNode,name=NameNodeStatus\",\"modelerType\":\"org.apache.hadoop.hdfs.server.namenode.NameNode\",\"State\":\"active\",\"NNRole\":\"NameNode\",\"HostAndPort\":\"namenode:8020\",\"SecurityEnabled\":false},{\"name\":\"Hadoop:service=NameNode,name=FSNamesystem\",\"modelerType\":\"FSNamesystem\",\"Tag.HAState\":\"active\",\"ClusterId\":\"CID-westy-0001\",\"BlockCapacity\":1000000}]}"
+  },
+  {
+    "template_id": "yarn-resourcemanager-info-exposure",
+    "path": "/ws/v1/cluster/info",
+    "content_type": "application/json",
+    "headers": { "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "{\"clusterInfo\":{\"id\":\"1680000000000\",\"startedOn\":1680000000000,\"state\":\"RUNNING\",\"haState\":\"ACTIVE\",\"resourceManagerVersion\":\"3.3.6\",\"resourceManagerBuildVersion\":\"3.3.6 from abc1234 by root\",\"resourceManagerVersionBuiltOn\":\"2023-01-01T00:00Z\",\"hadoopVersion\":\"3.3.6\",\"hadoopBuildVersion\":\"3.3.6 from def5678 by root\",\"hadoopVersionBuiltOn\":\"2023-01-01T00:00Z\"}}"
+  },
+  {
+    "template_id": "spark-master-applications-exposure",
+    "path": "/api/v1/applications",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "[{\"id\":\"app-20230101000000-0001\",\"name\":\"WordCount\",\"attempts\":[{\"attemptId\":\"1\",\"startTime\":\"2023-01-01T00:00:00.000GMT\",\"endTime\":\"2023-01-01T00:01:00.000GMT\",\"sparkUser\":\"hadoop\",\"completed\":true}]}]"
+  },
+  {
+    "template_id": "flink-dashboard-overview-exposure",
+    "path": "/jobs/overview",
+    "content_type": "application/json; charset=UTF-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"jobs\":[{\"jid\":\"9d1d1b1b1b1b1b1b1b1b1b1b1b1b1b1b\",\"name\":\"Kafka Ingestion\",\"state\":\"RUNNING\",\"start-time\":1680000000000,\"end-time\":-1,\"duration\":1000,\"last-modification\":1680000001000,\"tasks\":{\"total\":4,\"created\":0,\"scheduled\":0,\"deploying\":0,\"running\":4,\"finished\":0,\"canceling\":0,\"canceled\":0,\"failed\":0,\"reconciling\":0,\"initializing\":0}}]}"
+  },
+  {
+    "template_id": "hive-server2-cliservice-exposure",
+    "path": "/cliservice",
+    "status": 405,
+    "content_type": "application/json",
+    "headers": { "Allow": "POST", "Server": "Jetty(9.4.43.v20210629)" },
+    "body": "{\"statusCode\":405,\"message\":\"HTTP 405 Method Not Allowed: TCLIService Thrift endpoint requires POST\"}"
+  },
+  {
+    "template_id": "jenkins-script-console-anonymous-exposure",
+    "path": "/script",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "X-Jenkins": "2.401.1", "Server": "Jetty(10.0.13)" },
+    "body": "<html><head><title>Script Console [Jenkins]</title></head><body><form method=\"post\" action=\"script\"><textarea name=\"script\" class=\"jenkins-input\"></textarea><input type=\"submit\" value=\"Run\"></form><p>Groovy script console</p></body></html>"
+  },
+{
+    "template_id": "sonarqube-server-version-exposure",
+    "path": "/api/server/version",
+    "content_type": "text/plain",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "9.9.1.69595\n"
+  },
+  {
+    "template_id": "nexus-repository-status-exposure",
+    "path": "/service/rest/v1/status",
+    "content_type": "application/json",
+    "headers": { "Server": "Nexus/3.58.1-01 (OSS)" },
+    "body": "{\"edition\":\"OSS\",\"version\":\"3.58.1-01\",\"buildRevision\":\"a1b2c3d4\",\"buildTimestamp\":\"2023-01-01T00:00:00+0000\"}"
+  },
+  {
+    "template_id": "artifactory-system-ping-exposure",
+    "path": "/artifactory/api/system/ping",
+    "content_type": "text/plain",
+    "headers": { "Server": "Artifactory/7.55.10" },
+    "body": "OK"
+  },
+  {
+    "template_id": "harbor-systeminfo-exposure",
+    "path": "/api/v2.0/systeminfo",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"banner_message\":\"\",\"current_time\":\"2023-01-01T00:00:00Z\",\"registry_storage_provider_name\":\"filesystem\",\"harbor_version\":\"v2.8.0-1e0d0e6\",\"auth_mode\":\"db_auth\",\"project_creation_restriction\":\"everyone\",\"self_registration\":false,\"has_ca_root\":false,\"registry_url\":\"harbor.example.com\",\"external_url\":\"https://harbor.example.com\"}"
+  },
+  {
+    "template_id": "docker-registry-catalog-unauthorized",
+    "path": "/v2/_catalog",
+    "content_type": "application/json; charset=utf-8",
+    "headers": { "Docker-Distribution-Api-Version": "registry/2.0", "Server": "nginx/1.24.0" },
+    "body": "{\"repositories\":[\"library/nginx\",\"library/redis\"]}"
+  },
+  {
+    "template_id": "prometheus-status-config-exposure",
+    "path": "/api/v1/status/config",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"status\":\"success\",\"data\":{\"yaml\":\"global:\\n  scrape_interval: 15s\\n  evaluation_interval: 15s\\nrule_files:\\n  - /etc/prometheus/rules/*.yml\\nscrape_configs:\\n  - job_name: prometheus\\n    static_configs:\\n      - targets: ['localhost:9090']\\n\"}}"
+  },
+  {
+    "template_id": "prometheus-targets-exposure",
+    "path": "/api/v1/targets",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"status\":\"success\",\"data\":{\"activeTargets\":[{\"discoveredLabels\":{\"__address__\":\"localhost:9090\",\"__metrics_path__\":\"/metrics\",\"job\":\"prometheus\"},\"labels\":{\"instance\":\"localhost:9090\",\"job\":\"prometheus\"},\"scrapePool\":\"prometheus\",\"scrapeUrl\":\"http://localhost:9090/metrics\",\"globalUrl\":\"http://localhost:9090/metrics\",\"lastError\":\"\",\"lastScrape\":\"2023-01-01T00:00:00.000Z\",\"lastScrapeDuration\":0.005,\"health\":\"up\",\"scrapeInterval\":\"15s\",\"scrapeTimeout\":\"10s\"}],\"droppedTargets\":[]}}"
+  },
+  {
+    "template_id": "alertmanager-status-exposure",
+    "path": "/api/v2/status",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"cluster\":{\"name\":\"alertmanager-1\",\"peers\":[],\"status\":\"disabled\"},\"versionInfo\":{\"version\":\"0.25.0\",\"revision\":\"abc123\",\"branch\":\"HEAD\",\"buildUser\":\"root@build\",\"buildDate\":\"20230101-00:00:00\",\"goVersion\":\"go1.20.1\"},\"config\":{\"original\":\"global:\\n  resolve_timeout: 5m\\n\"},\"uptime\":\"2023-01-01T00:00:00Z\"}"
+  },
+  {
+    "template_id": "grafana-health-exposure",
+    "path": "/api/health",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"commit\":\"a5b2b1e0f1\",\"database\":\"ok\",\"version\":\"10.2.3\"}"
+  },
+  {
+    "template_id": "grafana-datasources-unauthorized",
+    "path": "/api/datasources",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "[{\"id\":1,\"uid\":\"P8E80F9AEF21F6940\",\"orgId\":1,\"name\":\"Prometheus\",\"type\":\"prometheus\",\"typeName\":\"Prometheus\",\"access\":\"proxy\",\"url\":\"http://prometheus:9090\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":true,\"jsonData\":{\"httpMethod\":\"POST\",\"timeInterval\":\"15s\"},\"readOnly\":false}]"
+  },
+  {
+    "template_id": "netdata-api-info-exposure",
+    "path": "/api/v1/info",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"version\":\"v1.42.0\",\"uid\":\"a1b2c3d4-0000-0000-0000-000000000000\",\"os_name\":\"Ubuntu\",\"os_id\":\"22.04\",\"os_version\":\"22.04\",\"kernel_name\":\"Linux\",\"kernel_version\":\"5.15.0-76-generic\",\"hostname\":\"netdata-host\",\"timezone\":\"UTC\",\"cores_total\":4,\"ram_total\":8259440640,\"container\":\"unknown\",\"virtualization\":\"none\",\"machine\":\"x86_64\"}"
+  },
+  {
+    "template_id": "graylog-api-system-exposure",
+    "path": "/api/system",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"facets\":{},\"version\":\"5.1.3\",\"is_processing\":false,\"hostname\":\"graylog.example.com\",\"lifecycle\":\"running\",\"lb_status\":\"alive\",\"timezone\":\"UTC\",\"leader\":\"http://graylog.example.com/api/\"}"
+  },
+  {
+    "template_id": "kibana-api-status-exposure",
+    "path": "/api/status",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"name\":\"kibana\",\"uuid\":\"a1b2c3d4-1111-2222-3333-444455556666\",\"version\":{\"number\":\"8.10.2\",\"build_hash\":\"abc123\",\"build_number\":62000,\"build_snapshot\":false},\"status\":{\"overall\":{\"level\":\"available\",\"summary\":\"All services are available\"},\"core\":{\"elasticsearch\":{\"level\":\"available\",\"summary\":\"Elasticsearch is available\",\"meta\":{\"icon\":\"elasticsearch\",\"color\":\"green\"}}}},\"metrics\":{\"last_updated\":\"2023-01-01T00:00:00.000Z\",\"uptime_in_millis\":1234567},\"response_time_in_millis\":45}"
+  },
+  {
+    "template_id": "zabbix-api-jsonrpc-exposure",
+    "path": "/api_jsonrpc.php",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32700,\"message\":\"Parse error\",\"data\":\"Invalid JSON.\"},\"id\":null}"
+  },
+  {
+    "template_id": "cacti-console-exposure",
+    "path": "/cacti/",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "<html><head><title>Login to Cacti</title></head><body><form name=\"login\" action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"action\" value=\"login\"><input type=\"text\" name=\"login_username\"></form><div id=\"cacti_version\">Cacti 1.2.25</div></body></html>"
+  },
+  {
+    "template_id": "nagios-status-cgi-exposure",
+    "path": "/nagios/cgi-bin/status.cgi",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "<html><head><title>Host Status Detail</title></head><body><div id=\"header\"><a href=\"status.cgi?host=all\">Hosts</a><a href=\"extinfo.cgi?type=1\">Extinfo</a><a href=\"cmd.cgi\">Commands</a></div><h1>Nagios Core 4.4.6</h1></body></html>"
+  },
+  {
+    "template_id": "kubernetes-namespaces-unauthorized",
+    "path": "/api/v1/namespaces",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"kind\":\"NamespaceList\",\"apiVersion\":\"v1\",\"metadata\":{\"resourceVersion\":\"123456\"},\"items\":[{\"metadata\":{\"name\":\"default\",\"uid\":\"a1b2c3d4\",\"resourceVersion\":\"100\"},\"spec\":{\"finalizers\":[\"kubernetes\"]},\"status\":{\"phase\":\"Active\"}},{\"metadata\":{\"name\":\"kube-system\",\"uid\":\"e5f6a7b8\",\"resourceVersion\":\"101\"},\"spec\":{\"finalizers\":[\"kubernetes\"]},\"status\":{\"phase\":\"Active\"}}]}"
+  },
+  {
+    "template_id": "kubelet-pods-unauthorized",
+    "path": "/pods",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"kind\":\"PodList\",\"apiVersion\":\"v1\",\"metadata\":{\"resourceVersion\":\"999\"},\"items\":[{\"metadata\":{\"name\":\"nginx-6d4cf56db6-abcde\",\"namespace\":\"default\",\"uid\":\"c1d2e3f4\"},\"spec\":{\"containers\":[{\"name\":\"nginx\",\"image\":\"nginx:1.25\"}]},\"status\":{\"phase\":\"Running\"}}]}"
+  },
+  {
+    "template_id": "consul-agent-self-unauthorized",
+    "path": "/v1/agent/self",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"Config\":{\"Datacenter\":\"dc1\",\"NodeName\":\"consul-1\",\"NodeID\":\"a1b2c3d4-e5f6\",\"Server\":true,\"Version\":\"1.16.2\",\"Revision\":\"abc123\",\"BuildDate\":\"2023-01-01T00:00:00Z\"},\"DebugConfig\":{\"DNSRecursors\":[],\"LogLevel\":\"INFO\"},\"Coord\":{\"Adjustment\":0,\"Error\":0,\"Vec\":[0,0,0,0],\"Height\":0.5},\"Member\":{\"Name\":\"consul-1\",\"Addr\":\"10.0.0.11\",\"Port\":8301,\"Tags\":{\"build\":\"1.16.2\",\"dc\":\"dc1\",\"role\":\"consul\",\"vsn\":\"2\"},\"Status\":1,\"ProtocolMin\":1,\"ProtocolMax\":5,\"ProtocolCur\":2,\"DelegateMin\":2,\"DelegateMax\":5,\"DelegateCur\":4}}"
+  },
+  {
+    "template_id": "consul-catalog-services-unauthorized",
+    "path": "/v1/catalog/services",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"consul\":[],\"web\":[\"http\",\"https\"],\"redis\":[\"tcp\"]}"
+  },
+  {
+    "template_id": "etcd-v2-keys-unauthorized",
+    "path": "/v2/keys/",
+    "content_type": "application/json",
+    "headers": { "X-Etcd-Cluster-Id": "c1d2e3f4a5b6c7d8" },
+    "body": "{\"action\":\"get\",\"node\":{\"key\":\"/\",\"dir\":true,\"nodes\":[{\"key\":\"/registry\",\"dir\":true,\"modifiedIndex\":10,\"createdIndex\":10},{\"key\":\"/registry/config\",\"value\":\"app-config-v1\",\"modifiedIndex\":11,\"createdIndex\":11}],\"modifiedIndex\":1,\"createdIndex\":1}}"
+  },
+  {
+    "template_id": "nomad-agent-members-unauthorized",
+    "path": "/v1/agent/members",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "[{\"Name\":\"nomad-1\",\"Addr\":\"10.0.0.21\",\"Port\":4648,\"Tags\":{\"build\":\"1.6.2\",\"dc\":\"dc1\",\"region\":\"global\",\"role\":\"nomad\",\"status\":\"alive\",\"vsn\":\"1\"},\"Status\":\"alive\",\"ProtocolMin\":1,\"ProtocolMax\":5,\"ProtocolCur\":2,\"DelegateMin\":2,\"DelegateMax\":5,\"DelegateCur\":4}]"
+  },
+  {
+    "template_id": "rancher-public-settings-exposure",
+    "path": "/v3-public/settings",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"type\":\"collection\",\"resourceType\":\"setting\",\"links\":{\"self\":\"https://rancher.example.com/v3-public/settings\"},\"createTypes\":{},\"actions\":{},\"pagination\":{},\"sort\":{},\"filters\":{},\"data\":[{\"id\":\"server-version\",\"type\":\"setting\",\"links\":{},\"default\":\"v2.7.9\",\"customized\":false}]}"
+  },
+{
+    "template_id": "svn-entries-exposure",
+    "path": "/.svn/entries",
+    "content_type": "text/plain",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "12\n\ndir\n.1045\nhttps://svn.example.com/repo/trunk\nsvn://svn.example.com/repo\n2023-01-01T00:00:00.000000Z\n\nfile\napp.js\n"
+  },
+  {
+    "template_id": "hg-requires-exposure",
+    "path": "/.hg/requires",
+    "content_type": "text/plain",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "dotencode\nfncache\ngeneraldelta\nrevlogv1\nsparserevlog\nstore\nstore-compression\n"
+  },
+  {
+    "template_id": "ds-store-exposure",
+    "path": "/.DS_Store",
+    "content_type": "application/octet-stream",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "\u0000\u0000\u0000\u0001Bud1\u0000\u0000\u0010\u0000\u0000\u0000\u0008\u0000\u0000\u0000\u0000application"
+  },
+  {
+    "template_id": "web-inf-web-xml-exposure",
+    "path": "/WEB-INF/web.xml",
+    "content_type": "application/xml",
+    "headers": { "Server": "Apache-Coyote/1.1" },
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\" version=\"4.0\">\n  <servlet>\n    <servlet-name>app</servlet-name>\n    <servlet-class>com.example.AppServlet</servlet-class>\n  </servlet>\n  <servlet-mapping>\n    <servlet-name>app</servlet-name>\n    <url-pattern>/app/*</url-pattern>\n  </servlet-mapping>\n  <welcome-file-list><welcome-file>index.jsp</welcome-file></welcome-file-list>\n</web-app>"
+  },
+  {
+    "template_id": "meta-inf-manifest-exposure",
+    "path": "/META-INF/MANIFEST.MF",
+    "content_type": "text/plain",
+    "headers": { "Server": "Apache-Coyote/1.1" },
+    "body": "Manifest-Version: 1.0\r\nCreated-By: Maven JAR Plugin 3.3.0\r\nBuilt-By: jenkins\r\nImplementation-Title: app-service\r\nImplementation-Version: 1.4.2\r\nMain-Class: com.example.Main\r\n\r\n"
+  },
+  {
+    "template_id": "crossdomain-xml-exposure",
+    "path": "/crossdomain.xml",
+    "content_type": "application/xml",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<?xml version=\"1.0\"?>\n<!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\">\n<cross-domain-policy>\n  <allow-access-from domain=\"*\" />\n  <allow-http-request-headers-from domain=\"*\" headers=\"*\"/>\n</cross-domain-policy>"
+  },
+  {
+    "template_id": "apache-server-status-exposure",
+    "path": "/server-status",
+    "content_type": "text/html; charset=UTF-8",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "<html><head><title>Apache Server Status for example.com</title></head><body><h1>Apache Server Status for example.com</h1><dl><dt>Server Version: Apache/2.4.52 (Ubuntu)</dt><dt>Server MPM: prefork</dt><dt>Current Time: Monday, 01-Jan-2023 00:00:00 UTC</dt><dt>Total accesses: 12345 - Total Traffic: 8.5 MB</dt></dl></body></html>"
+  },
+  {
+    "template_id": "apache-server-info-exposure",
+    "path": "/server-info",
+    "content_type": "text/html; charset=UTF-8",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)" },
+    "body": "<html><head><title>Apache Server Information</title></head><body><h1>Apache Server Information</h1><h2>Server Settings</h2><dl><dt>Server Version: Apache/2.4.52 (Ubuntu)</dt><dt>Server Built: 2023-01-01T00:00:00</dt></dl><h2>Loaded Modules</h2><table><tr><th>Module Name</th><th>Shared Object</th></tr><tr><td>core_module</td><td>(built-in)</td></tr></table></body></html>"
+  },
+  {
+    "template_id": "aspnet-trace-axd-exposure",
+    "path": "/trace.axd",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Microsoft-IIS/10.0", "X-AspNet-Version": "4.0.30319" },
+    "body": "<html><head><title>Application Trace</title></head><body><h1>Application Trace</h1><h2>Requests to this Application</h2><table><tr><th>Physical Directory</th><th>Request Details</th></tr><tr><td>C:\\inetpub\\wwwroot</td><td>Trace Information</td></tr></table></body></html>"
+  },
+  {
+    "template_id": "aspnet-elmah-axd-exposure",
+    "path": "/elmah.axd",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Microsoft-IIS/10.0", "X-AspNet-Version": "4.0.30319" },
+    "body": "<html><head><title>Error Log for /</title><link rel=\"stylesheet\" href=\"elmah.axd/stylesheet\"></head><body><h1>Error Log for /</h1><table><tr><td>System.NullReferenceException: Object reference not set to an instance of an object.</td></tr></table><div class=\"footer\">Powered by ELMAH 1.2.2</div></body></html>"
+  },
+  {
+    "template_id": "web-config-exposure",
+    "path": "/web.config",
+    "content_type": "application/xml",
+    "headers": { "Server": "Microsoft-IIS/10.0" },
+    "body": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<configuration>\n  <appSettings>\n    <add key=\"Environment\" value=\"Production\" />\n    <add key=\"CacheDriver\" value=\"redis\" />\n  </appSettings>\n  <connectionStrings>\n    <add name=\"Default\" connectionString=\"Server=127.0.0.1;Database=appdb;User Id=appuser;Password=***;\" />\n  </connectionStrings>\n  <system.web>\n    <compilation debug=\"false\" />\n    <customErrors mode=\"RemoteOnly\" />\n  </system.web>\n</configuration>"
+  },
+  {
+    "template_id": "composer-json-exposure",
+    "path": "/composer.json",
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"name\":\"acme/app-service\",\"description\":\"Example service\",\"type\":\"project\",\"license\":\"MIT\",\"require\":{\"php\":\">=8.1\",\"guzzlehttp/guzzle\":\"^7.5\"},\"require-dev\":{\"phpunit/phpunit\":\"^10.0\"},\"autoload\":{\"classmap\":[\"src/\"]}}"
+  },
+  {
+    "template_id": "sql-dump-file-exposure",
+    "path": "/backup.sql",
+    "content_type": "application/sql",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "-- MySQL dump 10.13  Distrib 8.0.32, for Linux (x86_64)\n--\n-- Host: localhost    Database: appdb\n-- ------------------------------------------------------\n/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;\n\nDROP TABLE IF EXISTS `users`;\nCREATE TABLE `users` (\n  `id` int NOT NULL,\n  `username` varchar(64) NOT NULL,\n  `password_hash` varchar(255) NOT NULL,\n  PRIMARY KEY (`id`)\n);\n\nINSERT INTO `users` VALUES (1,'admin','$2a$10$examplehash');\n"
+  },
+  {
+    "template_id": "www-zip-exposure",
+    "path": "/www.zip",
+    "content_type": "application/zip",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "PK\u0003\u0004\u0014\u0000\u0000\u0000\u0008\u0000index.html-site-source-archive"
+  },
+  {
+    "template_id": "phpmyadmin-panel-exposure",
+    "path": "/phpmyadmin/index.php",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "Apache/2.4.52 (Ubuntu)", "Set-Cookie": "phpMyAdmin=abc123; path=/; HttpOnly" },
+    "body": "<html><head><title>phpMyAdmin</title><meta name=\"generator\" content=\"phpMyAdmin 5.2.1\"></head><body><form method=\"post\" action=\"index.php\" name=\"login_form\"><input type=\"text\" name=\"pma_username\" id=\"input_username\"><input type=\"password\" name=\"pma_password\" id=\"input_password\"><input type=\"submit\" value=\"Log in\"></form><div id=\"pma_footer\">phpMyAdmin 5.2.1</div></body></html>"
+  },
+  {
+    "template_id": "adminer-panel-exposure",
+    "path": "/adminer.php",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<html><head><title>Adminer 4.8.1</title></head><body><form action=\"\" method=\"post\"><input type=\"hidden\" name=\"auth[driver]\" value=\"server\"><input name=\"auth[server]\" value=\"localhost\"><input name=\"auth[username]\"><input name=\"auth[password]\" type=\"password\"><input type=\"submit\" value=\"Login\"></form><p class=\"version\">Adminer 4.8.1</p></body></html>"
+  },
+  {
+    "template_id": "clickhouse-http-interface-exposure",
+    "path": "/ping",
+    "content_type": "text/html; charset=UTF-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "Ok.\n"
+  },
+  {
+    "template_id": "influxdb-health-exposure",
+    "path": "/health",
+    "content_type": "application/json",
+    "headers": { "X-Influxdb-Version": "1.8.10", "Server": "nginx/1.24.0" },
+    "body": "{\"name\":\"influxdb\",\"message\":\"ready for queries and writes\",\"status\":\"pass\",\"checks\":[],\"version\":\"1.8.10\",\"commit\":\"abc1234\"}"
+  },
+  {
+    "template_id": "couchdb-all-dbs-unauthorized",
+    "path": "/_all_dbs",
+    "content_type": "application/json",
+    "headers": { "Server": "CouchDB/3.3.2 (Erlang OTP/24)" },
+    "body": "[\"_replicator\",\"_users\",\"myapp\"]"
+  },
+  {
+    "template_id": "neo4j-browser-exposure",
+    "path": "/browser/",
+    "content_type": "text/html; charset=utf-8",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "<html><head><title>Neo4j Browser</title></head><body><div id=\"neo4j-browser-root\"></div><script>window.NEO4J_CONNECT_URL = \"bolt://localhost:7687\";</script><script src=\"/browser/neo4j-browser-4.4.0.js\"></script></body></html>"
+  },
+  {
+    "template_id": "minio-health-live-exposure",
+    "path": "/minio/health/live",
+    "content_type": "text/plain",
+    "headers": { "Server": "MinIO", "Vary": "Origin" },
+    "body": ""
+  }]

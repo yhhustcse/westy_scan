@@ -1,0 +1,1115 @@
+[
+  {
+    "id": "weaver-ecology-wui-exposure",
+    "info": {
+      "name": "泛微 e-cology 前端入口暴露",
+      "severity": "low",
+      "description": "泛微 e-cology 的 /wui/index.html 未授权可访问（该页通常只以 JSESSIONID 下发会话、页面本身需登录），可用于确认资产身份与版本线索。只读探测，不涉及任何接口调用。",
+      "tags": ["exposure", "cn-app", "oa", "weaver"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/wui/index.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/wui/theme/", "/wui/common/"], "condition": "or" }
+        ],
+        "extractors": [
+          { "type": "kval", "kval": ["Set-Cookie"], "name": "session_cookie" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "weaver-eoffice-panel-exposure",
+    "info": {
+      "name": "泛微 e-office 登录面板暴露",
+      "severity": "medium",
+      "description": "泛微 e-office 登录面板对外可达，可作为口令强度审计入口（本模板只读，不发送任何登录请求）。",
+      "tags": ["exposure", "cn-app", "oa", "weaver"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/eoffice/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(ECOM_|eoffice)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/eoffice/static/", "e-office"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "seeyon-oa-panel-exposure",
+    "info": {
+      "name": "致远 Seeyon OA 登录面板暴露",
+      "severity": "medium",
+      "description": "致远 A8/Seeyon OA 登录面板对外可达。仅做页面可达性与产品特征判定，不调用任何业务接口。",
+      "tags": ["exposure", "cn-app", "oa", "seeyon"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/seeyon/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/seeyon/ajax-lib/", "/seeyon/common/", "A8"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "landray-ekp-panel-exposure",
+    "info": {
+      "name": "蓝凌 EKP 登录面板暴露",
+      "severity": "medium",
+      "description": "蓝凌 EKP 协同办公平台登录入口对外可达，页面特征包含 /ekp/ 资源路径与 sys/ui 主题目录。",
+      "tags": ["exposure", "cn-app", "oa", "landray"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ekp/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/ekp/sys/ui/", "/ekp/portal/", "EKP"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tongda-oa-login-code-exposure",
+    "info": {
+      "name": "通达 OA 登录页暴露",
+      "severity": "low",
+      "description": "通达 OA 的 ispirit 登录页可未授权访问。本模板只做页面可达性判断，不请求验证码、不提交任何表单。",
+      "tags": ["exposure", "cn-app", "oa", "tongda"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ispirit/login_code.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["ispirit", "MYOA"], "condition": "or" },
+          { "type": "regex", "part": "header", "regex": ["(?i)(P_?HPSESSID|OA_USER|MYOA)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "huatian-oa-panel-exposure",
+    "info": {
+      "name": "华天动力 OA 面板暴露",
+      "severity": "medium",
+      "description": "华天动力 OA 门户未登录即返回登录跳转页或面板页，可作为口令审计入口。",
+      "tags": ["exposure", "cn-app", "oa", "huatian"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/OA/"],
+        "redirects": true,
+        "max-redirects": 3,
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["华天动力", "/OA/portal", "htoa"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "yonyou-nc-portal-exposure",
+    "info": {
+      "name": "用友 NC 门户未授权可达",
+      "severity": "low",
+      "description": "用友 NC 的登录页与 mdd 资源入口未授权可达，Response 头带 yonyou 专有标记。仅确认资产身份与界面泄露，不调用任何业务 servlet。",
+      "tags": ["exposure", "cn-app", "erp", "yonyou"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/portal/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/nc/servlet/", "NCCloud", "用友"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "yonyou-yonsuite-panel-exposure",
+    "info": {
+      "name": "用友 YonSuite 登录入口暴露",
+      "severity": "low",
+      "description": "用友 YonSuite（yonbip）登录入口未授权可达，页面特征包含 /iuap-sso/ 与 yonbip 品牌标记。",
+      "tags": ["exposure", "cn-app", "erp", "yonyou"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/iuap-sso/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|iuap)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/iuap-sso/", "yonbip", "YonSuite"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kingdee-eas-panel-exposure",
+    "info": {
+      "name": "金蝶 EAS 登录面板暴露",
+      "severity": "medium",
+      "description": "金蝶 EAS 管理控制台登录页对外可达，页面特征包含 /eas/ 资源路径与 Kingdee 品牌标记。",
+      "tags": ["exposure", "cn-app", "erp", "kingdee"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/eas/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/eas/portal/", "Kingdee", "kingdee"], "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kingdee-k3cloud-panel-exposure",
+    "info": {
+      "name": "金蝶 K3Cloud 登录面板暴露",
+      "severity": "medium",
+      "description": "金蝶 K3Cloud 登录入口对外可达，页面特征包含 /K3Cloud/ 路径与 K3CloudLogin 资源引用。",
+      "tags": ["exposure", "cn-app", "erp", "kingdee"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/K3Cloud/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)ASP.NET_SessionId=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/K3Cloud/", "K3CloudLogin"], "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "inspur-gs-panel-exposure",
+    "info": {
+      "name": "浪潮 GS 管理端暴露",
+      "severity": "medium",
+      "description": "浪潮 GS 企业管理软件 Web 管理端登录页对外可达，页面特征包含 /GS/ 路径与浪潮品牌标记。",
+      "tags": ["exposure", "cn-app", "erp", "inspur"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/GS/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/GS/login", "浪潮", "Inspur"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sap-netweaver-portal-exposure",
+    "info": {
+      "name": "SAP NetWeaver Portal 暴露",
+      "severity": "low",
+      "description": "SAP NetWeaver Portal 的 /irj/portal 未授权可达并自动跳转登录，可用于确认 SAP 资产与版本线索。",
+      "tags": ["exposure", "middleware", "portal", "sap"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/irj/portal"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200, 302] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|SAP_SESSIONID)" }, "condition": "and" },
+          { "type": "header", "headers": { "Location": "(?i)(/irj/portal|logon|sap)" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dameng-dmweb-console-exposure",
+    "info": {
+      "name": "达梦数据库 Web 管理端暴露",
+      "severity": "medium",
+      "description": "达梦数据库 DMWeb 管理控制台登录页对外可达，页面特征包含 /dameng/ 与 DM 品牌标记。",
+      "tags": ["exposure", "unauthorized", "database", "dameng"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/dameng/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/dameng/", "达梦", "DMWeb"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kingbase-web-console-exposure",
+    "info": {
+      "name": "人大金仓 Web 管理端暴露",
+      "severity": "medium",
+      "description": "人大金仓 KingbaseES Web 管理控制台登录页对外可达，页面特征包含 Kingbase 品牌与 /kingbase/ 资源路径。",
+      "tags": ["exposure", "database", "kingbase"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/kingbase/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["Kingbase", "kingbase", "金仓"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "oceanbase-ocp-console-exposure",
+    "info": {
+      "name": "OceanBase OCP 控制台暴露",
+      "severity": "medium",
+      "description": "OceanBase 云平台（OCP）控制台登录页对外可达，页面特征包含 OCP 静态资源与 /ocp/ 路径。",
+      "tags": ["exposure", "database", "oceanbase"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ocp/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|ocp_)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/ocp/static/", "OceanBase", "ocp-login"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tidb-dashboard-exposure",
+    "info": {
+      "name": "TiDB Dashboard 暴露",
+      "severity": "medium",
+      "description": "TiDB Dashboard（PD 内置监控面板）对外可达并泄露集群信息，页面/接口含 TiDB Dashboard 专有标记。",
+      "tags": ["exposure", "database", "tidb", "dashboard"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/dashboard/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["TiDB Dashboard", "tidb-dashboard"], "condition": "or" },
+          { "type": "regex", "part": "header", "regex": ["(?i)(X-Frame-Options|TiDB)" ] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tongweb-console-exposure",
+    "info": {
+      "name": "东方通 TongWeb 控制台暴露",
+      "severity": "medium",
+      "description": "东方通 TongWeb 应用服务器管理控制台登录页对外可达，页面特征包含 /tongweb/ 资源与 TongWeb 品牌。",
+      "tags": ["exposure", "middleware", "tongweb"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/tongweb/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|tongweb)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["TongWeb", "/tongweb/console", "tongweb"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bes-console-exposure",
+    "info": {
+      "name": "宝兰德 BES 控制台暴露",
+      "severity": "medium",
+      "description": "宝兰德 BES 应用服务器管理控制台登录页对外可达，页面特征包含 BES 品牌与 /bes/console 路径。",
+      "tags": ["exposure", "middleware", "bes"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/bes/console/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/bes/console", "BES", "宝兰德"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "inforSuite-console-exposure",
+    "info": {
+      "name": "中创 InforSuite 控制台暴露",
+      "severity": "medium",
+      "description": "中创中间件 InforSuite AS 管理控制台登录页对外可达，页面特征包含 InforSuite 品牌与 /inforSuite/ 路径。",
+      "tags": ["exposure", "middleware", "inforsuite"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/inforSuite/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["InforSuite", "inforSuite", "中创"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "huawei-esight-panel-exposure",
+    "info": {
+      "name": "华为 eSight 网管面板暴露",
+      "severity": "medium",
+      "description": "华为 eSight 网络管理平台登录页对外可达，页面特征包含 /eSight/ 资源路径与 Huawei 品牌。",
+      "tags": ["exposure", "cn-app", "nms", "huawei"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/eSight/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|eSight)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/eSight/", "eSight", "Huawei"], "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "h3c-imc-panel-exposure",
+    "info": {
+      "name": "H3C iMC 网管面板暴露",
+      "severity": "medium",
+      "description": "H3C 智能管理中心（iMC）登录页对外可达，页面特征包含 /imc/ 资源路径与 iMC 品牌标记。",
+      "tags": ["exposure", "cn-app", "nms", "h3c"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/imc/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/imc/", "iMC", "H3C"], "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ruijie-riil-panel-exposure",
+    "info": {
+      "name": "锐捷 RIIL 运维平台暴露",
+      "severity": "medium",
+      "description": "锐捷 RIIL 综合运维管理平台登录页对外可达，页面特征包含 /RIIL/ 资源路径与 RIIL 品牌标记。",
+      "tags": ["exposure", "cn-app", "nms", "ruijie"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/RIIL/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|RIIL)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/RIIL/", "RIIL", "锐捷"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sangfor-ac-panel-exposure",
+    "info": {
+      "name": "深信服 AC 上网行为管理面板暴露",
+      "severity": "medium",
+      "description": "深信服 AC 管理面板登录页对外可达，页面特征包含 /ac/ 资源路径与 Sangfor 品牌标记。",
+      "tags": ["exposure", "cn-app", "security-appliance", "sangfor"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ac/"],
+        "redirects": true,
+        "max-redirects": 3,
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|TWFID)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/ac/", "Sangfor", "深信服"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sangfor-af-panel-exposure",
+    "info": {
+      "name": "深信服 AF 下一代防火墙面板暴露",
+      "severity": "medium",
+      "description": "深信服 AF 管理面板登录页对外可达，页面特征包含 /af/ 资源路径与 Sangfor 品牌标记。",
+      "tags": ["exposure", "cn-app", "security-appliance", "sangfor"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/af/"],
+        "redirects": true,
+        "max-redirects": 3,
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(JSESSIONID=|TWFID)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/af/", "Sangfor", "深信服"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "manageengine-opmanager-api-exposure",
+    "info": {
+      "name": "ManageEngine OpManager API 未授权暴露",
+      "severity": "high",
+      "description": "OpManager 的 ember 客户端接口未授权可达并泄露部署信息，属于未授权敏感接口。本模板只读取一份静态配置，不做任何写操作。",
+      "tags": ["unauthorized", "nms", "manageengine"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/apiclient/ember"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["OpManager", "opmanager", "ManageEngine"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)(ember|\"product\"|apiclient)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "solarwinds-orion-login-exposure",
+    "info": {
+      "name": "SolarWinds Orion 登录页暴露",
+      "severity": "medium",
+      "description": "SolarWinds Orion 网络管理平台登录页对外可达，响应头/表单含 Orion 专有标记。",
+      "tags": ["exposure", "nms", "solarwinds"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/Orion/Login.aspx"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)ASP.NET_SessionId=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/Orion/", "Orion", "SolarWinds"], "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "prtg-web-panel-exposure",
+    "info": {
+      "name": "PRTG 监控面板暴露",
+      "severity": "medium",
+      "description": "Paessler PRTG 监控面板登录页对外可达，响应头含 PRTG 专有 Cookie，页面含 PRTG 品牌标记。",
+      "tags": ["exposure", "nms", "prtg"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/index.htm"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)PRTG" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["PRTG", "Paessler"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jumpserver-panel-exposure",
+    "info": {
+      "name": "JumpServer 堡垒机登录页暴露",
+      "severity": "medium",
+      "description": "JumpServer 堡垒机登录页对外可达，页面特征包含 /core/auth/login 表单与 JumpServer 品牌标记。",
+      "tags": ["exposure", "cn-app", "bastion", "jumpserver"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/core/auth/login/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(sessionid=|csrftoken=)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/core/auth/login", "JumpServer", "jumpserver"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "shterm-bastion-panel-exposure",
+    "info": {
+      "name": "齐治堡垒机登录页暴露",
+      "severity": "medium",
+      "description": "齐治科技（Shterm）运维堡垒机登录页对外可达，页面特征包含 shterm 专有 JS 路径与品牌标记。",
+      "tags": ["exposure", "cn-app", "bastion", "shterm"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/shterm/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["shterm", "齐治"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cloudbility-bastion-panel-exposure",
+    "info": {
+      "name": "行云管家堡垒机登录页暴露",
+      "severity": "medium",
+      "description": "行云管家（Cloudbility）堡垒机登录页对外可达，页面特征包含 cloudbility 专有资源路径与品牌标记。",
+      "tags": ["exposure", "cn-app", "bastion", "cloudbility"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/cloudbility/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)JSESSIONID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["cloudbility", "行云管家"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hikvision-device-login-exposure",
+    "info": {
+      "name": "海康威视设备 Web 登录页暴露",
+      "severity": "medium",
+      "description": "海康威视（Hikvision）设备 Web 管理口登录页对外可达，页面特征包含 /doc/page/ 资源路径与专有 JS。",
+      "tags": ["exposure", "cn-app", "iot", "hikvision"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/doc/page/login.asp"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(WebSession|language=)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/doc/page/", "Hikvision", "海康威视"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hikvision-isapi-devinfo-exposure",
+    "info": {
+      "name": "海康威视 ISAPI 设备信息未授权读取",
+      "severity": "high",
+      "description": "海康威视 ISAPI 的 deviceInfo 接口可未授权读取（只读 GET），直接泄露设备型号、序列号与固件版本。本模板只发一次 GET，不修改任何配置。",
+      "tags": ["unauthorized", "iot", "hikvision", "device-info"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ISAPI/System/deviceInfo"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["DeviceInfo", "deviceName", "serialNumber"], "condition": "or" },
+          { "type": "header", "headers": { "Content-Type": "(?i)xml" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["<serialNumber>([^<]+)</serialNumber>"], "group": 1, "name": "serial" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dahua-current-config-exposure",
+    "info": {
+      "name": "大华设备配置接口未授权暴露",
+      "severity": "high",
+      "description": "大华（Dahua）设备的 current_config 接口可疑未授权可达（只读 GET）。本模板只判断页面可达与产品专有特征，不解析、不修改配置数据。",
+      "tags": ["unauthorized", "iot", "dahua"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/current_config/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(DhWebSession|Dahua)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["current_config", "Dahua", "大华"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dahua-rpc2-login-exposure",
+    "info": {
+      "name": "大华设备 Web 登录页暴露",
+      "severity": "medium",
+      "description": "大华设备 RPC2 登录页对外可达，页面特征包含 RPC2_Login 专有表单与 Dahua 品牌标记。",
+      "tags": ["exposure", "iot", "dahua"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/RPC2_Login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(DhWebSession|Dahua)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["RPC2_Login", "Dahua", "大华"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uniview-device-login-exposure",
+    "info": {
+      "name": "宇视设备 Web 登录页暴露",
+      "severity": "medium",
+      "description": "宇视（Uniview）设备 Web 管理口登录页对外可达，页面特征包含 /LAPI/ 专有资源与 Uniview 品牌。",
+      "tags": ["exposure", "cn-app", "iot", "uniview"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/login.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(uniview|WebSession_s)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["Uniview", "uniview", "宇视"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "axis-cgi-panel-exposure",
+    "info": {
+      "name": "Axis 设备 CGI 接口暴露",
+      "severity": "medium",
+      "description": "Axis 网络摄像机/视频编码器的 axis-cgi 管理入口对外可达（只读 GET），页面含 Axis 专有标记。",
+      "tags": ["exposure", "iot", "axis"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/axis-cgi/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["axis-cgi", "AXIS", "Axis"], "condition": "or" },
+          { "type": "header", "headers": { "Server": "(?i)axis" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dvr-nvr-web-panel-exposure",
+    "info": {
+      "name": "DVR/NVR 录像机通用 Web 面板暴露",
+      "severity": "low",
+      "description": "DVR/NVR 录像机 Web 管理面板对外可达，页面特征包含 DVR/nvr 专有 JS 与品牌标记（界面泄露）。",
+      "tags": ["exposure", "iot", "dvr"],
+      "confidence": "low"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/DVR.htm"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["DVR", "NVR", "dvr"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)(dvr\\.js|nvr\\.js|webplugin)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fortinet-fortigate-panel-exposure",
+    "info": {
+      "name": "Fortinet FortiGate 管理面板暴露",
+      "severity": "medium",
+      "description": "FortiGate 管理界面登录页对外可达。判据使用 Fortinet 专有特征（FortiGate 品牌、/login?redir 表单），不依赖泛化的 login 字样。",
+      "tags": ["exposure", "network-device", "fortinet"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["FortiGate", "Fortinet", "fortinet"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)/login\\?redir=|fgt_lang|/content/fortinet"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "paloalto-globalprotect-panel-exposure",
+    "info": {
+      "name": "Palo Alto GlobalProtect 门户暴露",
+      "severity": "medium",
+      "description": "Palo Alto GlobalProtect 门户登录页对外可达，页面特征包含 /global-protect/ 专有资源与品牌标记。",
+      "tags": ["exposure", "network-device", "paloalto"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/global-protect/login.esp"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(PHPSESSID=|PAN_)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/global-protect/", "GlobalProtect", "Palo Alto"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sonicwall-auth-panel-exposure",
+    "info": {
+      "name": "SonicWall 管理面板暴露",
+      "severity": "medium",
+      "description": "SonicWall 防火墙管理登录页对外可达，页面特征包含 SonicWall 品牌与 auth1.html 专有引用。",
+      "tags": ["exposure", "network-device", "sonicwall"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/auth1.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(SonicWall|SWSESSION|swap=)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["SonicWall", "sonicwall", "auth1.html"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cisco-asa-login-exposure",
+    "info": {
+      "name": "Cisco ASA WebVPN 登录页暴露",
+      "severity": "medium",
+      "description": "Cisco ASA 的 WebVPN 登录页对外可达，页面特征包含 +CSCOE+ 专有资源路径与 Cisco 品牌标记。",
+      "tags": ["exposure", "network-device", "cisco"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/+CSCOE+/logon.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["+CSCOE+", "CSCOE", "Cisco"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)(webvpn|/+CSCOE+/|logon\\.html)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "f5-bigip-tmui-exposure",
+    "info": {
+      "name": "F5 BIG-IP 管理界面暴露",
+      "severity": "medium",
+      "description": "F5 BIG-IP 的 TMUI 管理界面登录页对外可达，页面特征包含 /tmui/ 专有资源与 BIG-IP 品牌标记。",
+      "tags": ["exposure", "network-device", "f5"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/tmui/login.jsp"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "header", "regex": ["(?i)(F5_|BIGIP|LastMRH_Session|MRHSession)"] },
+          { "type": "word", "part": "body", "words": ["/tmui/", "BIG-IP", "F5 Networks"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "citrix-netscaler-vpn-exposure",
+    "info": {
+      "name": "Citrix NetScaler VPN 门户暴露",
+      "severity": "medium",
+      "description": "Citrix NetScaler/ADC 的 VPN 门户入口对外可达，判据为 NSC_ 专有 Cookie 与 NetScaler 页面特征。",
+      "tags": ["exposure", "network-device", "citrix"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/vpn/index.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)NSC_" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["NetScaler", "ns_gui", "Citrix"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sangfor-ssl-vpn-panel-exposure",
+    "info": {
+      "name": "深信服 SSL VPN 登录页暴露",
+      "severity": "medium",
+      "description": "深信服 SSL VPN 登录页对外可达，判据为 TWFID 专有 Cookie 与 svpn 专有页面标记。",
+      "tags": ["exposure", "cn-app", "sslvpn", "sangfor"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/por/login_psw.csp"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)TWFID=" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["svpn_name", "Sangfor", "深信服"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "array-networks-sslvpn-exposure",
+    "info": {
+      "name": "Array Networks SSL VPN 门户暴露",
+      "severity": "medium",
+      "description": "Array Networks SSL VPN 门户登录页对外可达，判据为 ANsession 专有 Cookie 与 /prx/ 专有路径标记。",
+      "tags": ["exposure", "network-device", "sslvpn", "array"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/prx/000/http/localhost/login"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(ANsession|arraynetworks)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["/prx/", "Array Networks", "arraynetworks"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hillstone-panel-exposure",
+    "info": {
+      "name": "山石网科 Hillstone 管理面板暴露",
+      "severity": "medium",
+      "description": "山石网科（Hillstone）设备 Web 管理登录页对外可达，判据为 Hillstone 品牌标记与专有 JS 路径。",
+      "tags": ["exposure", "cn-app", "network-device", "hillstone"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/login.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(hillstone|HS_)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["Hillstone", "hillstone", "山石网科"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "synology-dsm-panel-exposure",
+    "info": {
+      "name": "群晖 DSM 管理面板暴露",
+      "severity": "medium",
+      "description": "群晖 DSM 管理入口对外可达（返回 302 到登录页并下发 DSM 专有 Cookie），属于管理面板暴露。",
+      "tags": ["exposure", "nas", "synology"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/webman/index.cgi"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200, 302] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)id=[A-Za-z0-9]" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["Synology", "DiskStation", "DSM"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "qnap-qts-panel-exposure",
+    "info": {
+      "name": "威联通 QNAP QTS 管理面板暴露",
+      "severity": "medium",
+      "description": "威联通 QNAP QTS 管理入口对外可达，判据为 QTS 品牌标记与 QNAP 专有登录资源路径。",
+      "tags": ["exposure", "nas", "qnap"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/cgi-bin/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(QMS_SID|NAS_|qnap)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["QTS", "QNAP", "/cgi-bin/authLogin.cgi"], "condition": "or" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hp-printer-ews-exposure",
+    "info": {
+      "name": "HP 打印机内嵌 Web 服务器暴露",
+      "severity": "low",
+      "description": "HP 打印机 EWS（/hp/device/）对外可达，页面泄露型号与固件版本（界面泄露）。",
+      "tags": ["exposure", "printer", "hp"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/hp/device/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["/hp/device/", "HP ", "Hewlett-Packard"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)(hp device|ews|embedded web server)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "truenas-webui-exposure",
+    "info": {
+      "name": "TrueNAS 管理界面暴露",
+      "severity": "medium",
+      "description": "TrueNAS/FreeNAS Web 管理界面对外可达同时泄露版本号（如 13.0-U5），属管理面板暴露与版本泄露。",
+      "tags": ["exposure", "nas", "truenas"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ui/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Set-Cookie": "(?i)(sessionid=|truenas)" }, "condition": "and" },
+          { "type": "word", "part": "body", "words": ["TrueNAS", "FreeNAS"], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["/(ui|webui)/"] }
+        ]
+      }
+    ]
+  }
+]

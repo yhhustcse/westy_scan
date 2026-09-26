@@ -1,0 +1,38 @@
+{
+  "targets": [
+    "https://demo.example.com",
+    "10.0.0.0/24"
+  ],
+  "target_file": "",
+
+  "authorized": false,
+  "allow": [
+    "demo.example.com",
+    "10.0.0.0/24"
+  ],
+  "deny": [
+    "10.0.0.1"
+  ],
+  "strict_scope": true,
+  "max_hosts": 1024,
+
+  "ports": "common",
+  "concurrency": 200,
+  "rate_limit": 0,
+  "timeout_sec": 3,
+  "banner": true,
+  "user_agent": "Mozilla/5.0 (compatible; westy-scan/0.1; authorized-testing)",
+  "blind_web_probes": 500,
+
+  "crawl": true,
+  "crawl_depth": 2,
+  "crawl_max_pages": 500,
+  "crawl_same_host": true,
+
+  "output_format": "table",
+  "output_file": "out/assets.jsonl",
+  "report_file": "",
+  "rules_file": "",
+  "audit_file": "out/audit.jsonl",
+  "verbose": false
+}

@@ -1,0 +1,1205 @@
+[
+  {
+    "id": "actuator-heapdump-exposure",
+    "info": { "name": "Spring Boot Actuator heapdump 可下载", "severity": "high", "description": "未授权的 /actuator/heapdump 可下载完整 JVM 堆转储，其中常含数据库口令、会话令牌与内存中的密钥。", "tags": ["exposure", "unauthorized", "actuator", "springboot"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/heapdump"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["^JAVA PROFILE 1\\.0\\.[0-9]"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)octet-stream" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["^JAVA PROFILE 1\\.0\\.([0-9])"], "group": 1, "name": "heap_profile_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "actuator-mappings-exposure",
+    "info": { "name": "Spring Boot Actuator /actuator/mappings 未授权", "severity": "medium", "description": "映射表端点未授权可读，直接给出全部 URL 路由与控制器方法，便于进一步攻击。", "tags": ["exposure", "unauthorized", "actuator", "springboot"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/mappings"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"mappings\""] },
+          { "type": "word", "part": "body", "words": ["\"dispatcherServlets\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "actuator-beans-exposure",
+    "info": { "name": "Spring Boot Actuator /actuator/beans 未授权", "severity": "medium", "description": "Bean 列表未授权可读，暴露应用内部类结构、依赖关系与配置类全名。", "tags": ["exposure", "unauthorized", "actuator", "springboot"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/beans"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"beans\""] },
+          { "type": "word", "part": "body", "words": ["\"singleton\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"([a-zA-Z0-9_.$]+)\":\\{\"scope\":\"singleton\""], "group": 1, "name": "bean_names" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "actuator-configprops-exposure",
+    "info": { "name": "Spring Boot Actuator /actuator/configprops 未授权", "severity": "high", "description": "配置属性端点未授权可读，泄露数据源 URL、账号等配置（口令通常已被掩码）。", "tags": ["exposure", "unauthorized", "actuator", "springboot", "config"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/configprops"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"prefix\"\\s*:\\s*\""] },
+          { "type": "regex", "part": "body", "regex": ["\"(properties|inputs)\"\\s*:\\s*\\{"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "actuator-threaddump-exposure",
+    "info": { "name": "Spring Boot Actuator /actuator/threaddump 未授权", "severity": "medium", "description": "线程转储未授权可读，泄露线程栈、类名与正在处理的请求路径。", "tags": ["exposure", "unauthorized", "actuator", "springboot"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/threaddump"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"threadName\""] },
+          { "type": "word", "part": "body", "words": ["\"stackTrace\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "spring-cloud-gateway-routes-exposure",
+    "info": { "name": "Spring Cloud Gateway 路由表未授权", "severity": "high", "description": "/actuator/gateway/routes 未授权可读，泄露全部后端服务地址与路由谓词，可用于 SSRF 与绕过前置鉴权。", "tags": ["exposure", "unauthorized", "springcloud", "gateway"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/gateway/routes"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"route_id\""] },
+          { "type": "word", "part": "body", "words": ["\"predicates\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"uri\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "backend_uris" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jolokia-list-exposure",
+    "info": { "name": "Jolokia MBean 列表未授权", "severity": "high", "description": "/jolokia/list 未授权可读，结合 Jolokia 的 exec 操作可进一步读取配置甚至执行代码。", "tags": ["exposure", "unauthorized", "jolokia", "jmx"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/jolokia/list"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"java.lang\""] },
+          { "type": "word", "part": "body", "words": ["\"java.util.logging\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "druid-monitor-index-exposure",
+    "info": { "name": "Druid 监控首页未授权", "severity": "medium", "description": "Druid Stat 监控页面未授权可访问，泄露数据源、SQL 执行统计与连接池状态。", "tags": ["exposure", "unauthorized", "druid", "monitor"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/druid/index.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<title>[^<]*druid"] },
+          { "type": "word", "part": "body", "words": ["datasource"], "case-insensitive": true }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "druid-sql-monitor-exposure",
+    "info": { "name": "Druid SQL 监控页未授权", "severity": "medium", "description": "Druid SQL 监控页未授权可访问，泄露真实 SQL 语句与执行计划。", "tags": ["exposure", "unauthorized", "druid", "monitor"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/druid/sql.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<title>[^<]*druid"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(sql\\.html|slow sql|>SQL<)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "springfox-v2-api-docs-exposure",
+    "info": { "name": "Swagger 2.x 接口文档未授权（/v2/api-docs）", "severity": "low", "description": "springfox 的 /v2/api-docs 未授权可读，直接给出全部接口、参数与数据结构。", "tags": ["exposure", "swagger", "api"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v2/api-docs"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"swagger\"\\s*:\\s*\"2\\."] },
+          { "type": "word", "part": "body", "words": ["\"paths\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "api_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "springdoc-v3-api-docs-exposure",
+    "info": { "name": "OpenAPI 3 接口文档未授权（/v3/api-docs）", "severity": "low", "description": "springdoc 的 /v3/api-docs 未授权可读，直接给出全部接口与参数结构。", "tags": ["exposure", "swagger", "api"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v3/api-docs"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"openapi\"\\s*:\\s*\"3\\."] },
+          { "type": "word", "part": "body", "words": ["\"paths\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"openapi\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "openapi_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "swagger-ui-index-exposure",
+    "info": { "name": "Swagger UI 页面未授权（/swagger-ui/index.html）", "severity": "low", "description": "Swagger UI 静态页面未授权可访问，通常同时暴露可读的 OpenAPI 文档。", "tags": ["exposure", "swagger", "api"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/swagger-ui/index.html"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["SwaggerUIBundle"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)swagger-ui"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "graphql-introspection-exposure",
+    "info": { "name": "GraphQL 内省接口未授权", "severity": "medium", "description": "GraphQL 端点允许未授权内省，攻击者可直接获取完整 Schema（类型、字段、变更）。", "tags": ["exposure", "unauthorized", "graphql", "api"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/graphql?query=%7B__schema%7BqueryType%7Bname%7D%7D%7D"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"__schema\""] },
+          { "type": "word", "part": "body", "words": ["\"queryType\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elasticsearch-cluster-health-exposure",
+    "info": { "name": "Elasticsearch 集群健康信息未授权", "severity": "medium", "description": "未授权可读 /_cluster/health，泄露集群名、节点数与分片状态。", "tags": ["exposure", "unauthorized", "elasticsearch", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/_cluster/health"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"cluster_name\""] },
+          { "type": "word", "part": "body", "words": ["\"number_of_nodes\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"cluster_name\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "cluster_name" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elasticsearch-nodes-info-exposure",
+    "info": { "name": "Elasticsearch 节点信息未授权", "severity": "medium", "description": "未授权可读 /_nodes，泄露节点名、内网地址、版本与角色。", "tags": ["exposure", "unauthorized", "elasticsearch", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/_nodes"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"_nodes\"\\s*:\\s*\\{"] },
+          { "type": "word", "part": "body", "words": ["\"transport_address\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"version\"\\s*:\\s*\"([0-9][^\"]*)\""], "group": 1, "name": "es_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elasticsearch-search-api-exposure",
+    "info": { "name": "Elasticsearch 检索接口未授权", "severity": "high", "description": "未授权可调用 /_search 读取索引数据，可直接检索业务数据甚至凭据。", "tags": ["exposure", "unauthorized", "elasticsearch", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/_search?size=1"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"_shards\""] },
+          { "type": "regex", "part": "body", "regex": ["\"hits\"\\s*:\\s*\\{"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "solr-admin-cores-exposure",
+    "info": { "name": "Solr 管理接口未授权", "severity": "high", "description": "未授权可读 /solr/admin/cores，泄露 Core 名称与服务端绝对路径（instanceDir）。", "tags": ["exposure", "unauthorized", "solr", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/solr/admin/cores?wt=json"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"responseHeader\""] },
+          { "type": "regex", "part": "body", "regex": ["\"instanceDir\"\\s*:\\s*\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"instanceDir\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "instance_dir" }
+        ]
+      }
+    ]
+  },
+{
+    "id": "hadoop-namenode-jmx-exposure",
+    "info": { "name": "Hadoop NameNode JMX 未授权", "severity": "medium", "description": "NameNode 的 JMX 接口未授权可读，泄露集群 ID、HA 状态与容量信息。", "tags": ["exposure", "unauthorized", "hadoop", "jmx"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/jmx?qry=Hadoop:service=NameNode"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["Hadoop:service=NameNode"] },
+          { "type": "regex", "part": "body", "regex": ["\"beans\"\\s*:\\s*\\["] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"ClusterId\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "cluster_id" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "yarn-resourcemanager-info-exposure",
+    "info": { "name": "YARN ResourceManager 信息未授权", "severity": "medium", "description": "YARN RM 的 /ws/v1/cluster/info 未授权可读，泄露集群 ID、HA 状态与 Hadoop 版本。", "tags": ["exposure", "unauthorized", "hadoop", "yarn"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ws/v1/cluster/info"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"clusterInfo\""] },
+          { "type": "word", "part": "body", "words": ["\"resourceManagerVersion\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"hadoopVersion\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "hadoop_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "spark-master-applications-exposure",
+    "info": { "name": "Spark Master 应用列表未授权", "severity": "medium", "description": "Spark Master 的 REST 接口未授权可读，泄露应用名、提交用户与运行状态。", "tags": ["exposure", "unauthorized", "spark", "bigdata"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v1/applications"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"attempts\""] },
+          { "type": "regex", "part": "body", "regex": ["\"sparkUser\"\\s*:\\s*\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"sparkUser\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "spark_users" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flink-dashboard-overview-exposure",
+    "info": { "name": "Flink Dashboard 作业信息未授权", "severity": "medium", "description": "Flink Web UI 的 /jobs/overview 未授权可读，泄露作业 ID、名称与运行状态。", "tags": ["exposure", "unauthorized", "flink", "bigdata"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/jobs/overview", "{{BaseURL}}/config"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"(flink-version|last-modification|jid)\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hive-server2-cliservice-exposure",
+    "info": { "name": "HiveServer2 HTTP 服务暴露（/cliservice）", "severity": "medium", "description": "HiveServer2 的 Thrift-over-HTTP 端点对 GET 返回方法错误，说明服务以 HTTP 模式暴露且缺少前置访问控制。", "tags": ["exposure", "hive", "bigdata"], "confidence": "low" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/cliservice"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [400, 405] },
+          { "type": "header", "headers": { "Allow": "(?i)POST" } },
+          { "type": "regex", "part": "body", "regex": ["(?i)(tcliservice|thrift|method not allowed)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jenkins-script-console-anonymous-exposure",
+    "info": { "name": "Jenkins 脚本控制台可匿名访问", "severity": "high", "description": "仅探测 /script 表单页是否可匿名打开（不提交任何脚本）；可访问通常意味着 Groovy 代码执行权限。", "tags": ["exposure", "unauthorized", "jenkins", "ci"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/script"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<title>[^<]*script console"] },
+          { "type": "word", "part": "body", "words": ["Groovy"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sonarqube-server-version-exposure",
+    "info": { "name": "SonarQube 版本泄露（/api/server/version）", "severity": "low", "description": "未授权可读 SonarQube 版本，便于匹配已知漏洞。", "tags": ["exposure", "sonarqube", "disclosure", "ci"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/server/version"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^[0-9]+\\.[0-9]+(\\.[0-9]+)*\\s*$"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)text/html" }, "negative": true }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["([0-9]+\\.[0-9][0-9.]*[0-9])"], "group": 1, "name": "sonarqube_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nexus-repository-status-exposure",
+    "info": { "name": "Nexus Repository 状态接口未授权", "severity": "low", "description": "未授权可读 Nexus 状态接口，泄露产品版本与构建信息。", "tags": ["exposure", "nexus", "disclosure", "ci"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/service/rest/v1/status"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"edition\""] },
+          { "type": "word", "part": "body", "words": ["\"version\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "nexus_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "artifactory-system-ping-exposure",
+    "info": { "name": "Artifactory 存活接口可匿名访问", "severity": "low", "description": "未授权可访问 /artifactory/api/system/ping，确认制品库存在且允许匿名请求。", "tags": ["exposure", "artifactory", "ci"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/artifactory/api/system/ping"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^OK\\s*$"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)text/plain" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "harbor-systeminfo-exposure",
+    "info": { "name": "Harbor 系统信息未授权", "severity": "low", "description": "未授权可读 Harbor 系统信息，泄露版本、认证模式与仓库存储后端。", "tags": ["exposure", "harbor", "disclosure"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v2.0/systeminfo"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"harbor_version\""] },
+          { "type": "word", "part": "body", "words": ["\"auth_mode\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"harbor_version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "harbor_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "docker-registry-catalog-unauthorized",
+    "info": { "name": "Docker Registry 镜像目录未授权", "severity": "medium", "description": "未授权可列出 Registry 中的全部仓库，可进一步拉取镜像并从中提取凭据。", "tags": ["unauthorized", "exposure", "docker", "registry"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v2/_catalog"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"repositories\""] },
+          { "type": "header", "headers": { "Docker-Distribution-Api-Version": "(?i)registry/2\\.0" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\\[\\s*\"([^\"]+)\""], "group": 1, "name": "repositories" }
+        ]
+      }
+    ]
+  },
+{
+    "id": "prometheus-status-config-exposure",
+    "info": { "name": "Prometheus 配置接口未授权", "severity": "medium", "description": "未授权可读 /api/v1/status/config，直接拿到完整的抓取配置（含内网目标与凭据字段）。", "tags": ["exposure", "unauthorized", "prometheus", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v1/status/config"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"yaml\"\\s*:\\s*\""] },
+          { "type": "word", "part": "body", "words": ["scrape_interval"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "prometheus-targets-exposure",
+    "info": { "name": "Prometheus 抓取目标未授权", "severity": "medium", "description": "未授权可读 /api/v1/targets，泄露全部被监控实例的内网地址与 job 名。", "tags": ["exposure", "unauthorized", "prometheus", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v1/targets"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"activeTargets\""] },
+          { "type": "word", "part": "body", "words": ["\"scrapeUrl\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"scrapeUrl\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "scrape_urls" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alertmanager-status-exposure",
+    "info": { "name": "Alertmanager 状态接口未授权", "severity": "medium", "description": "未授权可读 /api/v2/status，泄露集群配置原文、版本与告警接收配置结构。", "tags": ["exposure", "unauthorized", "alertmanager", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v2/status"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"versionInfo\""] },
+          { "type": "word", "part": "body", "words": ["\"uptime\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grafana-health-exposure",
+    "info": { "name": "Grafana 健康接口未授权（版本泄露）", "severity": "low", "description": "未授权可读 /api/health，泄露 Grafana 版本与数据库状态。", "tags": ["exposure", "grafana", "disclosure", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/health"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"database\"\\s*:\\s*\"ok\""] },
+          { "type": "word", "part": "body", "words": ["\"commit\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "grafana_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grafana-datasources-unauthorized",
+    "info": { "name": "Grafana 数据源接口未授权", "severity": "high", "description": "未授权可读 /api/datasources，泄露数据源地址、账号与查询参数（口令字段已加密）。", "tags": ["unauthorized", "exposure", "grafana", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/datasources"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"typeName\""] },
+          { "type": "word", "part": "body", "words": ["\"jsonData\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"url\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "datasource_urls" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "netdata-api-info-exposure",
+    "info": { "name": "Netdata 信息接口未授权", "severity": "low", "description": "未授权可读 /api/v1/info，泄露主机名、操作系统、内核与硬件规格。", "tags": ["exposure", "unauthorized", "netdata", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v1/info"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"os_name\""] },
+          { "type": "word", "part": "body", "words": ["\"cores_total\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"hostname\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "hostname" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "graylog-api-system-exposure",
+    "info": { "name": "Graylog 系统接口未授权", "severity": "medium", "description": "未授权可读 /api/system，泄露版本、主机名与集群角色状态。", "tags": ["exposure", "graylog", "disclosure", "monitor"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/system"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"is_processing\""] },
+          { "type": "word", "part": "body", "words": ["\"lb_status\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kibana-api-status-exposure",
+    "info": { "name": "Kibana 状态接口未授权", "severity": "low", "description": "未授权可读 /api/status，泄露 Kibana 版本与各服务可用性。", "tags": ["exposure", "kibana", "disclosure", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/status"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"uptime_in_millis\""] },
+          { "type": "word", "part": "body", "words": ["\"overall\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"number\"\\s*:\\s*\"([0-9][^\"]*)\""], "group": 1, "name": "kibana_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "zabbix-api-jsonrpc-exposure",
+    "info": { "name": "Zabbix API 端点暴露（/api_jsonrpc.php）", "severity": "medium", "description": "仅用 GET 探测 Zabbix JSON-RPC 端点是否存在（不发送任何 JSON-RPC 请求体）。", "tags": ["exposure", "zabbix", "monitor"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api_jsonrpc.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"jsonrpc\"\\s*:\\s*\"2\\.0\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cacti-console-exposure",
+    "info": { "name": "Cacti 控制台暴露", "severity": "medium", "description": "Cacti 登录页面可未授权访问，面板版本通常可直接从页面读出。", "tags": ["exposure", "cacti", "monitor"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/cacti/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<title>[^<]*cacti"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(login to cacti|action=\"login\"|cacti_version)"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["[Cc]acti[^0-9]{0,12}([0-9]+\\.[0-9]+\\.[0-9]+)"], "group": 1, "name": "cacti_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nagios-status-cgi-exposure",
+    "info": { "name": "Nagios CGIs 未授权访问", "severity": "medium", "description": "Nagios 状态 CGI 未授权可访问，泄露主机、服务与告警全貌。", "tags": ["exposure", "unauthorized", "nagios", "monitor"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/nagios/cgi-bin/status.cgi"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["Nagios"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(extinfo\\.cgi|status\\.cgi|cmd\\.cgi|tac\\.cgi)"] }
+        ]
+      }
+    ]
+  },
+{
+    "id": "kubernetes-namespaces-unauthorized",
+    "info": { "name": "Kubernetes API 未授权（命名空间列表）", "severity": "high", "description": "未授权可读 /api/v1/namespaces，通常意味着整个 API Server 匿名可读，可进一步枚举工作负载与 Secret。", "tags": ["unauthorized", "exposure", "kubernetes", "container"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/v1/namespaces"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"kind\"\\s*:\\s*\"NamespaceList\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"metadata\"\\s*:\\s*\\{\\s*\"name\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "namespaces" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kubelet-pods-unauthorized",
+    "info": { "name": "Kubelet /pods 未授权", "severity": "high", "description": "Kubelet 只读接口未授权可读，泄露节点上全部 Pod、镜像与容器信息。", "tags": ["unauthorized", "exposure", "kubernetes", "kubelet"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/pods"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"kind\"\\s*:\\s*\"PodList\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "consul-agent-self-unauthorized",
+    "info": { "name": "Consul Agent 配置未授权", "severity": "high", "description": "未授权可读 /v1/agent/self，泄露数据中心、节点名与 Agent 完整配置（含 ACL 开关状态）。", "tags": ["unauthorized", "exposure", "consul", "container"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v1/agent/self"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"DebugConfig\""] },
+          { "type": "word", "part": "body", "words": ["\"Member\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"Version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "consul_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "consul-catalog-services-unauthorized",
+    "info": { "name": "Consul 服务目录未授权", "severity": "medium", "description": "未授权可读 /v1/catalog/services，泄露注册中心内的全部服务名与标签（Consul 未开 ACL 时通常同时可读写 KV）。", "tags": ["unauthorized", "exposure", "consul", "container"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v1/catalog/services"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"consul\"\\s*:\\s*\\["] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "etcd-v2-keys-unauthorized",
+    "info": { "name": "etcd v2 API 未授权（键空间可读）", "severity": "high", "description": "未授权可递归读取 etcd v2 键空间，Kubernetes 集群中常可直接拿到 ServiceAccount Token 等敏感数据。", "tags": ["unauthorized", "exposure", "etcd", "container"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v2/keys/?recursive=true"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"modifiedIndex\""] },
+          { "type": "word", "part": "body", "words": ["\"action\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nomad-agent-members-unauthorized",
+    "info": { "name": "Nomad Agent 成员接口未授权", "severity": "medium", "description": "未授权可读 /v1/agent/members，泄露 Nomad 集群节点、区域与数据中心信息（不发送任何写操作）。", "tags": ["unauthorized", "exposure", "nomad", "container"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v1/agent/members"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"role\"\\s*:\\s*\"nomad\""] },
+          { "type": "word", "part": "body", "words": ["\"Tags\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"build\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "nomad_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rancher-public-settings-exposure",
+    "info": { "name": "Rancher 公开设置接口暴露", "severity": "low", "description": "未授权可读 /v3-public/settings，泄露 Rancher 版本与实例公开配置。", "tags": ["exposure", "rancher", "kubernetes", "container"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/v3-public/settings"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"resourceType\""] },
+          { "type": "word", "part": "body", "words": ["\"server-version\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"default\"\\s*:\\s*\"(v[0-9][^\"]*)\""], "group": 1, "name": "rancher_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "svn-entries-exposure",
+    "info": { "name": "SVN 元数据文件暴露（.svn/entries）", "severity": "high", "description": "可读取 .svn/entries，攻击者可据此还原源码仓库目录结构甚至源码。", "tags": ["exposure", "svn", "source-leak"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/.svn/entries"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^dir$"] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^[0-9]{1,3}$"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hg-requires-exposure",
+    "info": { "name": "Mercurial 元数据文件暴露（.hg/requires）", "severity": "medium", "description": "可读取 .hg/requires，确认站点目录由 Mercurial 管理，可进一步尝试拉取变更记录。", "tags": ["exposure", "hg", "source-leak"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/.hg/requires"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["revlogv1"] },
+          { "type": "word", "part": "body", "words": ["store"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ds-store-exposure",
+    "info": { "name": "macOS .DS_Store 文件暴露", "severity": "low", "description": ".DS_Store 泄露目录内文件名清单，可为后续路径爆破提供线索。", "tags": ["exposure", "ds_store", "disclosure"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/.DS_Store"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["^.{4}Bud1"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "web-inf-web-xml-exposure",
+    "info": { "name": "WEB-INF/web.xml 可下载", "severity": "high", "description": "WEB-INF 下的 web.xml 可被直接下载，泄露 Servlet 映射、过滤器与初始化参数。", "tags": ["exposure", "config", "source-leak", "java"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/WEB-INF/web.xml"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<web-app"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<(servlet|servlet-mapping|filter|welcome-file-list)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "meta-inf-manifest-exposure",
+    "info": { "name": "META-INF/MANIFEST.MF 可下载", "severity": "medium", "description": "MANIFEST.MF 可被下载，泄露应用名、版本、构建者与依赖线索。", "tags": ["exposure", "config", "java", "disclosure"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/META-INF/MANIFEST.MF"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?im)^Manifest-Version:\\s*[0-9]"] },
+          { "type": "regex", "part": "body", "regex": ["(?im)^(Created-By|Built-By|Implementation-Title|Implementation-Version|Main-Class):"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["(?im)^Implementation-Version:\\s*([0-9][^\\r\\n]*)"], "group": 1, "name": "app_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "crossdomain-xml-exposure",
+    "info": { "name": "crossdomain.xml 策略文件暴露", "severity": "low", "description": "存在 Flash/Silverlight 跨域策略文件；若放开任意域，会扩大跨域读取面。", "tags": ["exposure", "misconfig", "crossdomain"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/crossdomain.xml"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)<cross-domain-policy"] },
+          { "type": "word", "part": "body", "words": ["allow-access-from"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "apache-server-status-exposure",
+    "info": { "name": "Apache mod_status 页面暴露", "severity": "medium", "description": "/server-status 未授权可读，泄露当前请求、客户端地址与服务器运行信息。", "tags": ["exposure", "apache", "misconfig"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/server-status"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["Apache Server Status"] },
+          { "type": "regex", "part": "body", "regex": ["Server Version:\\s*Apache/"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["Server Version:\\s*Apache/([0-9.]+)"], "group": 1, "name": "apache_version" }
+        ]
+      }
+    ]
+  },
+{
+    "id": "apache-server-info-exposure",
+    "info": { "name": "Apache mod_info 页面暴露", "severity": "medium", "description": "/server-info 未授权可读，泄露加载模块、编译参数与全部配置指令。", "tags": ["exposure", "apache", "misconfig"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/server-info"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)Apache Server Information"] },
+          { "type": "word", "part": "body", "words": ["Module Name"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aspnet-trace-axd-exposure",
+    "info": { "name": "ASP.NET trace.axd 暴露", "severity": "high", "description": "/trace.axd 未授权可读，泄露请求明细、服务器变量、会话与表单内容。", "tags": ["exposure", "aspnet", "misconfig"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/trace.axd"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)Application Trace"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)Requests to this Application"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aspnet-elmah-axd-exposure",
+    "info": { "name": "ASP.NET ELMAH 错误日志暴露", "severity": "high", "description": "/elmah.axd 未授权可读，泄露异常堆栈、请求参数与服务器变量。", "tags": ["exposure", "aspnet", "elmah"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/elmah.axd"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(elmah\\.axd/stylesheet|Error Log for)"] },
+          { "type": "word", "part": "body", "words": ["ELMAH"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["ELMAH\\s+([0-9][0-9.]+)"], "group": 1, "name": "elmah_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "web-config-exposure",
+    "info": { "name": "ASP.NET web.config 可下载", "severity": "high", "description": "web.config 可被直接下载，其中常含数据库连接串、应用密钥与内部路径。", "tags": ["exposure", "config", "aspnet", "credentials"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/web.config"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?is)<configuration"] },
+          { "type": "regex", "part": "body", "regex": ["(?is)<(system\\.web|appSettings|connectionStrings|system\\.webServer|system\\.data)"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["(?is)<add\\s+key=\"([^\"]{1,64})\""], "group": 1, "name": "appsetting_keys" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "composer-json-exposure",
+    "info": { "name": "composer.json 可下载", "severity": "low", "description": "composer.json 暴露，泄露依赖清单与包名，便于匹配已知组件漏洞。", "tags": ["exposure", "composer", "disclosure"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/composer.json"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["\"name\"\\s*:\\s*\"[^\"]+/[^\"]+\""] },
+          { "type": "regex", "part": "body", "regex": ["\"(require|require-dev|autoload)\"\\s*:\\s*[\\{\\[]"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"name\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "package_name" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sql-dump-file-exposure",
+    "info": { "name": "SQL 备份文件可下载", "severity": "high", "description": "站点根目录下的 SQL 备份可被直接下载，包含业务数据与口令散列。", "tags": ["exposure", "backup", "database", "credentials"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/backup.sql", "{{BaseURL}}/database.sql"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(CREATE TABLE|INSERT INTO|LOCK TABLES)"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(-- MySQL dump|-- PostgreSQL database dump|DROP TABLE IF EXISTS)"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "www-zip-exposure",
+    "info": { "name": "站点源码压缩包可下载", "severity": "high", "description": "站点根目录下的 www.zip 可被直接下载，等同源码泄露。", "tags": ["exposure", "backup", "source-leak"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/www.zip"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["^PK[\\x03\\x04\\x05\\x06\\x07]"] },
+          { "type": "header", "headers": { "Content-Type": "(?i)(zip|octet-stream)" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "phpmyadmin-panel-exposure",
+    "info": { "name": "phpMyAdmin 面板暴露", "severity": "medium", "description": "phpMyAdmin 登录页未授权可访问，面板版本可读，便于匹配已知漏洞。", "tags": ["exposure", "phpmyadmin", "panel", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/phpmyadmin/index.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(pma_username|pma_password)"] },
+          { "type": "word", "part": "body", "words": ["phpMyAdmin"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["phpMyAdmin\\s+([0-9]+\\.[0-9]+\\.[0-9]+)"], "group": 1, "name": "phpmyadmin_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "adminer-panel-exposure",
+    "info": { "name": "Adminer 面板暴露", "severity": "medium", "description": "Adminer 登录页未授权可访问，面板版本可读，便于匹配已知漏洞。", "tags": ["exposure", "adminer", "panel", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/adminer.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["name=\"auth\\[(driver|username|server)\\]\""] },
+          { "type": "word", "part": "body", "words": ["Adminer"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["Adminer\\s+([0-9]+\\.[0-9]+\\.[0-9]+)"], "group": 1, "name": "adminer_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "clickhouse-http-interface-exposure",
+    "info": { "name": "ClickHouse HTTP 接口暴露", "severity": "low", "description": "ClickHouse 的 /ping 返回固定的 Ok. 短响应（4 字节以内），确认 HTTP 接口可未授权访问。", "tags": ["exposure", "clickhouse", "database"], "confidence": "medium" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/ping", "{{BaseURL}}/replicas_status"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?i)^ok\\.\\s*$"] },
+          { "type": "size", "size": [3, 4] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "influxdb-health-exposure",
+    "info": { "name": "InfluxDB 健康接口暴露", "severity": "low", "description": "未授权可读 /health，泄露 InfluxDB 版本与就绪状态（不执行任何查询语句）。", "tags": ["exposure", "influxdb", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/health"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"influxdb\""] },
+          { "type": "word", "part": "body", "words": ["\"checks\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"version\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "influxdb_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "couchdb-all-dbs-unauthorized",
+    "info": { "name": "CouchDB 数据库列表未授权", "severity": "high", "description": "未授权可读 /_all_dbs，CouchDB 未启用鉴权（admin party）时通常可直接读写全部数据库。", "tags": ["unauthorized", "exposure", "couchdb", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/_all_dbs"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"_users\""] },
+          { "type": "word", "part": "body", "words": ["\"_replicator\""] },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" } }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "neo4j-browser-exposure",
+    "info": { "name": "Neo4j Browser 暴露", "severity": "low", "description": "Neo4j Browser 页面未授权可访问；数据访问仍需凭据，此处仅为界面暴露与版本线索。", "tags": ["exposure", "neo4j", "panel", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/browser/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["Neo4j Browser"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(neo4j-browser|bolt://)"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["neo4j-browser-([0-9]+\\.[0-9]+\\.[0-9]+)"], "group": 1, "name": "neo4j_browser_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "minio-health-live-exposure",
+    "info": { "name": "MinIO 服务暴露（health/live）", "severity": "low", "description": "未授权可访问 MinIO 健康检查端点（响应头带 Server: MinIO），确认对象存储服务对外可达。", "tags": ["exposure", "minio", "database"], "confidence": "high" },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/minio/health/live"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "header", "headers": { "Server": "(?i)minio" } }
+        ]
+      }
+    ]
+  }]

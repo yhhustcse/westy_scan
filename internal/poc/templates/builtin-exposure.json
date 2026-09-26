@@ -1,0 +1,305 @@
+[
+  {
+    "id": "git-config-exposure",
+    "info": {
+      "name": "Git 配置目录暴露",
+      "severity": "high",
+      "description": "可未授权读取 .git/config，攻击者可据此还原源码仓库。",
+      "tags": ["exposure", "git", "source-leak"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/.git/config"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["[core]"], "condition": "and" },
+          { "type": "regex", "part": "body", "regex": ["repositoryformatversion\\s*=\\s*[0-9]"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["url\\s*=\\s*(\\S+)"], "group": 1, "name": "remote" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "env-file-exposure",
+    "info": {
+      "name": "环境变量文件暴露",
+      "severity": "high",
+      "description": "可未授权读取 .env，其中通常包含数据库口令与云厂商密钥。",
+      "tags": ["exposure", "config", "credentials"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/.env"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^[A-Z0-9_]{3,}=.+"] },
+          { "type": "regex", "part": "body", "regex": ["(?i)(DB_|DATABASE_|APP_KEY|SECRET|API_KEY|AWS_|REDIS_|MYSQL_)"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["(?m)^([A-Z0-9_]{3,})="], "group": 1, "name": "env_keys" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "springboot-actuator-env",
+    "info": {
+      "name": "Spring Boot Actuator /env 未授权",
+      "severity": "high",
+      "description": "Actuator 端点未授权暴露，可能泄露配置项与数据源口令。",
+      "tags": ["springboot", "actuator", "unauthorized"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/env", "{{BaseURL}}/env"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["propertySources"], "condition": "and" },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" }, "condition": "and" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "springboot-actuator-health",
+    "info": {
+      "name": "Spring Boot Actuator 端点暴露",
+      "severity": "info",
+      "description": "Actuator 健康检查端点可未授权访问，属于信息泄露。",
+      "tags": ["springboot", "actuator", "disclosure"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/actuator/health"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"status\":\"UP\"", "\"status\": \"UP\""] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nacos-unauthorized-user-list",
+    "info": {
+      "name": "Nacos 用户列表未授权访问",
+      "severity": "high",
+      "description": "Nacos 未开启鉴权，可直接读取用户列表接口。",
+      "tags": ["nacos", "unauthorized"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/nacos/v1/auth/users?pageNo=1&pageSize=1"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"pageItems\"", "\"username\""], "condition": "and" }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["\"username\"\\s*:\\s*\"([^\"]+)\""], "group": 1, "name": "usernames" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elasticsearch-unauthorized-cat",
+    "info": {
+      "name": "Elasticsearch 未授权访问",
+      "severity": "high",
+      "description": "Elasticsearch 未开启鉴权，可直接列出索引。",
+      "tags": ["elasticsearch", "unauthorized", "database"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/_cat/indices"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^\\s*(green|yellow|red)\\s+open\\s"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "docker-api-unauthorized-version",
+    "info": {
+      "name": "Docker Remote API 未授权",
+      "severity": "critical",
+      "description": "Docker API 未做访问控制，等同于目标主机 root 权限。",
+      "tags": ["docker", "unauthorized", "rce-risk"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/version"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["\"ApiVersion\"", "\"MinAPIVersion\"", "\"Os\""], "condition": "and" },
+          { "type": "header", "headers": { "Content-Type": "(?i)json" }, "condition": "and" }
+        ],
+        "extractors": [
+          { "type": "json", "json": ["Version", "ApiVersion"], "name": "docker_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jenkins-unauthorized-api",
+    "info": {
+      "name": "Jenkins API 未授权访问",
+      "severity": "high",
+      "description": "Jenkins 允许匿名读取 API，可能进一步触发脚本执行。",
+      "tags": ["jenkins", "unauthorized", "ci"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/api/json"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["hudson\\.model\\.Hudson|hudson\\.model\\.Jenkins"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "phpinfo-exposure",
+    "info": {
+      "name": "phpinfo 页面暴露",
+      "severity": "medium",
+      "description": "phpinfo 泄露环境变量、绝对路径与扩展信息。",
+      "tags": ["php", "exposure", "disclosure"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/phpinfo.php", "{{BaseURL}}/info.php", "{{BaseURL}}/test.php"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["PHP Version", "php.ini"], "condition": "and" },
+          { "type": "title", "regex": ["(?i)phpinfo\\(\\)"] }
+        ],
+        "extractors": [
+          { "type": "regex", "part": "body", "regex": ["PHP Version\\s*([0-9.]+)"], "group": 1, "name": "php_version" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "prometheus-metrics-exposure",
+    "info": {
+      "name": "Prometheus 指标端点暴露",
+      "severity": "medium",
+      "description": "/metrics 未授权可读，泄露内部服务名、版本与调用关系。",
+      "tags": ["metrics", "exposure", "disclosure"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/metrics"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "regex", "part": "body", "regex": ["(?m)^# HELP "] },
+          { "type": "regex", "part": "body", "regex": ["go_gc_duration_seconds|process_cpu_seconds_total|_total\\{"] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "directory-listing-enabled",
+    "info": {
+      "name": "目录列表未关闭",
+      "severity": "low",
+      "description": "Web 服务器开启目录浏览，可能直接暴露源码与备份文件。",
+      "tags": ["disclosure", "misconfig"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["Index of /", "<table"], "condition": "and" },
+          { "type": "title", "regex": ["^Index of "] }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cors-misconfiguration-credentials",
+    "info": {
+      "name": "CORS 配置错误（反射任意来源且允许凭据）",
+      "severity": "medium",
+      "description": "服务端把请求 Origin 反射到 Access-Control-Allow-Origin 且允许携带凭据，可跨站读取敏感数据。",
+      "tags": ["cors", "misconfig"],
+      "confidence": "high"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/"],
+        "headers": {
+          "Origin": "https://wor-{{randstr}}.example.com",
+          "Accept": "*/*"
+        },
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "header", "headers": { "Access-Control-Allow-Origin": "wor-{{randstr}}\\.example\\.com" }, "condition": "and" },
+          { "type": "header", "headers": { "Access-Control-Allow-Credentials": "(?i)true" }, "condition": "and" }
+        ],
+        "extractors": [
+          { "type": "kval", "kval": ["Access-Control-Allow-Origin"], "name": "acao" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "swagger-ui-exposure",
+    "info": {
+      "name": "Swagger/OpenAPI 文档暴露",
+      "severity": "low",
+      "description": "接口文档未授权可访问，直接给出全部 API 与参数结构。",
+      "tags": ["swagger", "exposure", "api"],
+      "confidence": "medium"
+    },
+    "http": [
+      {
+        "method": "GET",
+        "path": ["{{BaseURL}}/swagger-ui.html", "{{BaseURL}}/v2/api-docs", "{{BaseURL}}/openapi.json"],
+        "matchers-condition": "and",
+        "matchers": [
+          { "type": "status", "status": [200] },
+          { "type": "word", "part": "body", "words": ["swagger", "openapi", "\"paths\""], "condition": "or" },
+          { "type": "regex", "part": "body", "regex": ["(?i)(swagger-ui|\"openapi\"\\s*:|swaggerVersion)"] }
+        ]
+      }
+    ]
+  }
+]

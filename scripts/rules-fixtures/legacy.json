@@ -1,0 +1,95 @@
+[
+  {
+    "template_id": "git-config-exposure",
+    "path": "/.git/config",
+    "status": 200,
+    "content_type": "text/plain",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "[core]\n\trepositoryformatversion = 0\n\tfilemode = true\n\tbare = false\n[remote \"origin\"]\n\turl = https://git.internal.example.com/app.git\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n"
+  },
+  {
+    "template_id": "env-file-exposure",
+    "path": "/.env",
+    "status": 200,
+    "content_type": "text/plain",
+    "body": "APP_ENV=production\nAPP_DEBUG=false\nDB_HOST=127.0.0.1\nDB_PASSWORD=Sup3rSecretValue\nREDIS_HOST=127.0.0.1\nAPI_KEY=abcdef1234567890\n"
+  },
+  {
+    "template_id": "springboot-actuator-env",
+    "path": "/actuator/env",
+    "status": 200,
+    "content_type": "application/json",
+    "headers": { "Server": "nginx/1.24.0" },
+    "body": "{\"activeProfiles\":[\"prod\"],\"propertySources\":[{\"name\":\"systemProperties\",\"properties\":{\"java.version\":{\"value\":\"17.0.9\"}}},{\"name\":\"applicationConfig: [classpath:/application.yml]\",\"properties\":{\"spring.datasource.url\":{\"value\":\"jdbc:mysql://127.0.0.1:3306/app\"}}}]}"
+  },
+  {
+    "template_id": "springboot-actuator-health",
+    "path": "/actuator/health",
+    "status": 200,
+    "content_type": "application/json",
+    "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\"},\"diskSpace\":{\"status\":\"UP\"}}}"
+  },
+  {
+    "template_id": "nacos-unauthorized-user-list",
+    "path": "/nacos/v1/auth/users",
+    "status": 200,
+    "content_type": "application/json",
+    "body": "{\"totalCount\":2,\"pageNumber\":1,\"pagesAvailable\":1,\"pageItems\":[{\"username\":\"nacos\",\"password\":\"$2a$10$demoHashValue\"},{\"username\":\"operator\",\"password\":\"$2a$10$otherHash\"}]}"
+  },
+  {
+    "template_id": "elasticsearch-unauthorized-cat",
+    "path": "/_cat/indices",
+    "status": 200,
+    "content_type": "text/plain",
+    "body": "green open users        1 0 10 0  10kb  10kb\nyellow open app-logs    1 0  5 0   5kb   5kb\n"
+  },
+  {
+    "template_id": "docker-api-unauthorized-version",
+    "path": "/version",
+    "status": 200,
+    "content_type": "application/json",
+    "body": "{\"Platform\":{\"Name\":\"Docker Engine - Community\"},\"Components\":[{\"Name\":\"Engine\",\"Version\":\"20.10.21\"}],\"Version\":\"20.10.21\",\"ApiVersion\":\"1.41\",\"MinAPIVersion\":\"1.12\",\"GitCommit\":\"baeda1f\",\"Os\":\"linux\",\"Arch\":\"amd64\"}"
+  },
+  {
+    "template_id": "jenkins-unauthorized-api",
+    "path": "/api/json",
+    "status": 200,
+    "content_type": "application/json",
+    "headers": { "X-Jenkins": "2.414.1", "Server": "Jetty(10.0.13)" },
+    "body": "{\"_class\":\"hudson.model.Hudson\",\"assignedLabels\":[{}],\"mode\":\"NORMAL\",\"nodeDescription\":\"the master Jenkins node\",\"numExecutors\":2,\"jobs\":[{\"name\":\"build-app\",\"url\":\"http://127.0.0.1:18082/job/build-app/\"}]}"
+  },
+  {
+    "template_id": "phpinfo-exposure",
+    "path": "/phpinfo.php",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "body": "<html><head><title>phpinfo()</title></head><body><h1>PHP Version 8.2.1</h1><table><tr><td>Loaded Configuration File</td><td>/etc/php/8.2/fpm/php.ini</td></tr></table></body></html>"
+  },
+  {
+    "template_id": "prometheus-metrics-exposure",
+    "path": "/metrics",
+    "status": 200,
+    "content_type": "text/plain; version=0.0.4; charset=utf-8",
+    "body": "# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.\n# TYPE go_gc_duration_seconds summary\ngo_gc_duration_seconds{quantile=\"0\"} 3.2e-05\n# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.\n# TYPE process_cpu_seconds_total counter\nprocess_cpu_seconds_total 12.34\n"
+  },
+  {
+    "template_id": "directory-listing-enabled",
+    "path": "/",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "headers": {
+      "Server": "nginx/1.24.0",
+      "Access-Control-Allow-Origin": "wor-canary.example.com",
+      "Access-Control-Allow-Credentials": "true"
+    },
+    "also_serves": ["cors-misconfiguration-credentials"],
+    "body": "<html><head><title>Index of /</title></head><body><h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\n<a href=\"backup.sql\">backup.sql</a>  12-Jan-2026 10:00   4096\n<a href=\"www.zip\">www.zip</a>        12-Jan-2026 10:00   8192\n</pre><table><tr><th>Name</th><th>Size</th></tr><tr><td>backup.sql</td><td>4096</td></tr></table></body></html>"
+  },
+  {
+    "template_id": "swagger-ui-exposure",
+    "path": "/swagger-ui.html",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "body": "<html><head><title>Swagger UI</title><link rel=\"stylesheet\" href=\"/webjars/springfox-swagger-ui/springfox.css\"></head><body><div id=\"swagger-ui\"></div><script>window.ui = SwaggerUIBundle({url: \"/v2/api-docs\", dom_id: '#swagger-ui'})</script></body></html>"
+  }
+]
