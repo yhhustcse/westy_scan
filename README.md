@@ -3,11 +3,8 @@
 ![Go](https://img.shields.io/badge/Go-1.21%2B-00ADD8)
 ![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![tests](https://img.shields.io/badge/tests-204%20passed%20%2F%20race%20clean-brightgreen)
-
-<!-- 推到 GitHub 后，把 <OWNER> 换成你的用户名即可显示 CI 状态徽章：
-[![ci](https://github.com/<OWNER>/westy_scan/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/westy_scan/actions/workflows/ci.yml)
--->
+![tests](https://img.shields.io/badge/tests-345%20passed%20%2F%20race%20clean-brightgreen)
+[![ci](https://github.com/yhhustcse/westy_scan/actions/workflows/ci.yml/badge.svg)](https://github.com/yhhustcse/westy_scan/actions/workflows/ci.yml)
 
 一个**面向授权渗透测试的资产测绘与攻击面发现框架**（Go，零第三方依赖）。
 
@@ -427,7 +424,12 @@ PowerShell 5.1 `ConvertFrom-Json` 数组套数组（同一坑踩了三次：演�
 **3 处靠错误字符串做控制流判定**（改文案就静默改变审计与状态码 → 全部换成哨兵错误 +
 `errors.Is`，顺带修好"DNS 解析失败不进 rejected 审计"）、
 **`ratelimit` 三个测试"与真实时钟赛跑"**（本地全绿、CI 上 `-race` 随机失败 →
-把令牌到达改成可注入时钟，精确条数断言不再依赖真实 ticker）。
+把令牌到达改成可注入时钟，精确条数断言不再依赖真实 ticker）、
+**`udpscan`/`crawl` 测试里的 data race**（假服务 handler 协程与测试协程共享变量无同步、
+`peak` 对原子变量做非原子读取、`portResolver` 全局被测试写而 worker 协程读 →
+本地侥幸不触发、CI 的 `-race` 必红；已按"有没有同步边"逐个修掉）、
+**SAN 越界断言写法错误**（在整份日志上做两个独立 `Contains`，把"合法扩展 + 越界被拒"
+误判成"越界被扫描"，Windows CI 随机红 → 改为逐行判断同一条事件）。
 
 ### CI 等价本地复现（用 CI 同版本工具链）
 

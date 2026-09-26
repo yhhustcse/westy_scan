@@ -726,6 +726,40 @@ M0–M7 交付后，功能与规则库都够用了，但有三个"诚实但难�
 > 本地 16 核 + go1.27 全绿，CI 2 核 + go1.21 + `-race` 就红 —— 差异本身就是信息。
 > 而"下载 CI 同版本工具链在本地复现"是拿回这条信息的最低成本手段（本项目已内置在 `.tools/go121`，
 > 见 README 的"CI 等价本地复现"小节）。
+10. **`udpscan` / `crawl` 测试里的 data race** 🔴（CI 第二次红，只在 `-race` 下暴露）
+    - 现象：拆开"无竞态/带竞态"两步后定位到 —— **不带竞态全过，只有 `-race` 挂**，
+      失败包是 `udpscan`（`TestScan_DNS_EndToEnd`、`TestScan_ConcurrencyBound`）；
+    - 根因（代码审查确认，不是检测器误报）：假服务端 handler 在**另一个协程**里访问测试变量，
+      测试协程随后直接读写，两者之间没有任何同步边：
+      ① `gotQueryType`/`gotQueryClass` 是裸 `uint16`（handler 写、测试读）；
+      ② `TestScan_ConcurrencyBound` 的 `peak` 用 `atomic.AddInt32` 累加、收尾却**直接读**
+      （对原子变量的非原子读取同样是 race）；③ `crawl/m3_test.go` 的 `fetchedJS` 是裸 `bool`；
+      ④ 生产侧 `udpscan.portResolver` 是"测试写全局、扫描 worker 协程读"的裸函数变量；
+    - 修复：`portResolver` 改为带 `RWMutex` 的 `resolveProbePort`/`setPortResolver`；
+      共享量改 `atomic.Uint32`/`atomic.Bool`；`peak` 读取走 `atomic.LoadInt32`；
+    - **为什么本地不复现**：取决于竞态检测器的记录窗口与协程调度 —— 本地快机器上
+      handler 协程往往在测试读取前就退出，检测器看不到冲突。所以这次是**按"有没有同步边"推导**的修复，
+      本地 `-race -count=30` 通过只是不矛盾的旁证。
+11. **SAN 越界断言的写法错误** 🟠（CI 转绿前的最后一红，Windows 特有）
+    - 现象：`verify / windows-latest` 挂在**不带竞态**那一步：
+      `--- FAIL: TestPipelineM2WebAndSAN: 越界域名被扫描了（严重问题）`；
+    - 根因：断言在**整份日志**上做两个独立的 `strings.Contains`：
+      `Contains(logText, "san_asset") && Contains(logText, "out-of-scope.example")`。
+      而越界域名必然出现在 `san_rejected` 的 reason 里，`san_asset` 事件却可能来自**合法**域名
+      （allow 内的 localhost）→ 只要合法扩展产出过一条资产事件，就误判成"越界被扫描"。
+      Linux 上恰好没产出 `san_asset`（SAN 端口 443/80 没有服务在听），Windows runner 上产出了；
+    - 修复：改为**逐行**判断"同一条事件里既有 `san_asset` 又有越界域名"，
+      这样既能抓住真实越界，也不受合法扩展影响；
+    - 附带价值：这条断言是合规性质的（越界扫描是红线），把它写对比让它"看起来绿"重要得多。
+
+### CI 工程化（本轮顺带补齐）
+- **失败摘要输出为 check-run annotation**：GitHub 的 job 日志需要账号鉴权才能读（API 403），
+  而 annotation 公开可读。把诊断逻辑抽成 `scripts/ci-run-tests.sh`（两步共用），
+  失败时输出环境信息 + 失败行（`%` 已转义）+ 日志尾部。**这一改动直接让"没有仓库权限也能排查 CI"成立**
+  —— 上面两个缺陷就是靠它拿到的真实输出；
+- 测试拆成"**不含竞态**"和"**含竞态**"两步：一旦红了能立刻区分"测试逻辑问题"还是"竞态特有"，
+  本次定位就受益于此（第一次红在两步都挂→逻辑/环境；第二次红只挂竞态步→同步问题）；
+- `cross-build` 任务独立跑 4 个目标（linux/amd64、linux/arm64、windows/amd64、darwin/arm64）。
 
 > 这一轮的元教训：**这些缺陷全都是在"为 0% 覆盖率的包补测试"时暴露的**。
 > 覆盖率本身不是目的，但"为了写测试而逐行读懂别人的模块契约"是**目前最有效的缺陷发现手段**——
