@@ -199,10 +199,10 @@ func processJob(ctx context.Context, j job, opt Options) (model.Asset, bool) {
 		return model.Asset{}, false
 	}
 
-	// 实际发包端口来自 portResolver：生产环境就是注册端口本身，
+	// 实际发包端口来自探针端口映射：生产环境就是注册端口本身，
 	// 测试里可以把它改写成临时端口，从而在不占用 53/161 等特权端口的前提下
 	// 走完整的 Scan → 发包 → 解析 → 产出资产 链路。
-	dialPort := portResolver(entry.port)
+	dialPort := resolveProbePort(entry.port)
 	res, err := entry.fn(ctx, udpNetwork(j.ip, dialPort), net.JoinHostPort(j.ip, strconv.Itoa(dialPort)), opt.Timeout)
 	if err != nil {
 		// 协议格式非法（响应太短/畸形），或本地 socket 错误。
@@ -216,9 +216,39 @@ func processJob(ctx context.Context, j job, opt Options) (model.Asset, bool) {
 	return finalize(ctx, j, dialPort, entry, res)
 }
 
-// portResolver 把探针注册端口映射为实际发包端口。默认恒等映射，
-// 仅测试会替换它（改写为本地临时端口），生产代码不要修改。
-var portResolver = func(port int) int { return port }
+// 探针端口映射（默认恒等）。仅测试会替换它（改写为本地临时端口），生产代码不要修改。
+//
+// 为什么用锁而不是裸变量：这个函数是**扫描 worker 协程在读**、
+// 测试在写（含 t.Cleanup 里的还原），裸变量就是一个真实的 data race ——
+// 本地快机器上侥幸不触发，CI 上跑 -race 就会红。加锁后读写都有同步边。
+var (
+	portResolverMu sync.RWMutex
+	portResolver   = func(port int) int { return port }
+)
+
+// resolveProbePort 读取当前映射并应用（持读锁取函数指针，再调用）。
+func resolveProbePort(port int) int {
+	portResolverMu.RLock()
+	f := portResolver
+	portResolverMu.RUnlock()
+	return f(port)
+}
+
+// setPortResolver 替换映射，返回还原函数（测试用；生产代码不要调用）。
+func setPortResolver(f func(int) int) (restore func()) {
+	portResolverMu.Lock()
+	old := portResolver
+	if f == nil {
+		f = func(p int) int { return p }
+	}
+	portResolver = f
+	portResolverMu.Unlock()
+	return func() {
+		portResolverMu.Lock()
+		portResolver = old
+		portResolverMu.Unlock()
+	}
+}
 
 // protocolEntropy 是随机 ID 的来源。默认 crypto/rand（报文 ID 可预测会带来
 // 缓存投毒/响应伪造风险），仅测试会替换成确定性来源以便校验报文编码。

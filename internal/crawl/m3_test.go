@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -283,9 +284,11 @@ func TestCrawlerDisableJS(t *testing.T) {
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprint(w, `<html><script src="/app.js"></script><body>x</body></html>`)
 	})
-	fetchedJS := false
+	// handler 在 http 服务的协程里执行，测试协程随后读取 —— 必须用 atomic，
+	// 裸 bool 是真实的 data race（本地常常侥幸不触发，CI 上 -race 会红）。
+	var fetchedJS atomic.Bool
 	mux.HandleFunc("/app.js", func(w http.ResponseWriter, r *http.Request) {
-		fetchedJS = true
+		fetchedJS.Store(true)
 		fmt.Fprint(w, `fetch("/api/x");`)
 	})
 	srv := httptest.NewServer(mux)
@@ -294,7 +297,7 @@ func TestCrawlerDisableJS(t *testing.T) {
 	c := New(Options{MaxDepth: 2, MaxPages: 10, Concurrency: 2, Timeout: 3 * time.Second, DisableJS: true})
 	for range c.Run(context.Background(), []string{srv.URL + "/"}) {
 	}
-	if fetchedJS {
+	if fetchedJS.Load() {
 		t.Error("DisableJS=true 时不应抓取外链 JS")
 	}
 }

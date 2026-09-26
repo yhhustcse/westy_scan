@@ -24,16 +24,18 @@ import (
 
 // withProbePorts 把探针注册端口临时改写到本地假服务端的临时端口。
 // 这样端到端测试可以走完整的 Scan 链路，又不需要占用 53/123/137/161。
+//
+// 走 setPortResolver 而不是直接赋值：扫描 worker 协程会并发读这个映射，
+// 裸赋值是一个真实的 data race（本地不触发、CI 上 -race 必红）。
 func withProbePorts(t *testing.T, mapping map[int]int) {
 	t.Helper()
-	old := portResolver
-	portResolver = func(p int) int {
+	restore := setPortResolver(func(p int) int {
 		if v, ok := mapping[p]; ok {
 			return v
 		}
 		return p
-	}
-	t.Cleanup(func() { portResolver = old })
+	})
+	t.Cleanup(restore)
 }
 
 // appendName 追加一个 DNS 名字（仅用于测试构造响应）。
@@ -901,7 +903,10 @@ func TestParseNetBIOS_Malformed(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestScan_DNS_EndToEnd(t *testing.T) {
-	var gotQueryType, gotQueryClass uint16
+	// 这两个值由假服务端的 handler **在另一个协程里**写入、由测试协程读取。
+	// 必须用 atomic：裸变量之间没有同步边，是一个真实的 data race
+	// （本地快机器上常常侥幸不触发，CI 上跑 -race 就会红 —— 这正是 CI 抓出来的问题）。
+	var gotQueryType, gotQueryClass atomic.Uint32
 	srv := startFakeServer(t, func(req []byte) []byte {
 		if len(req) < dnsHeaderLen+5 {
 			t.Errorf("DNS 请求过短: %d 字节", len(req))
@@ -913,8 +918,8 @@ func TestScan_DNS_EndToEnd(t *testing.T) {
 		if flags := binary.BigEndian.Uint16(req[2:4]); flags != dnsFlagRD {
 			t.Errorf("Flags = 0x%04x, 期望 0x%04x（RD=1，其余为 0）", flags, dnsFlagRD)
 		}
-		gotQueryType = binary.BigEndian.Uint16(req[len(req)-4 : len(req)-2])
-		gotQueryClass = binary.BigEndian.Uint16(req[len(req)-2:])
+		gotQueryType.Store(uint32(binary.BigEndian.Uint16(req[len(req)-4 : len(req)-2])))
+		gotQueryClass.Store(uint32(binary.BigEndian.Uint16(req[len(req)-2:])))
 		if req[12] != 0x00 {
 			t.Errorf("QNAME 首字节 = 0x%02x, 期望 0x00（根域）", req[12])
 		}
@@ -959,8 +964,8 @@ func TestScan_DNS_EndToEnd(t *testing.T) {
 	if a.FoundAt.IsZero() {
 		t.Errorf("FoundAt 未填充")
 	}
-	if gotQueryType != dnsTypeNS || gotQueryClass != dnsClassIN {
-		t.Errorf("QTYPE/QCLASS = %d/%d, 期望 %d/%d", gotQueryType, gotQueryClass, dnsTypeNS, dnsClassIN)
+	if qt, qc := gotQueryType.Load(), gotQueryClass.Load(); qt != dnsTypeNS || qc != dnsClassIN {
+		t.Errorf("QTYPE/QCLASS = %d/%d, 期望 %d/%d", qt, qc, dnsTypeNS, dnsClassIN)
 	}
 }
 
@@ -1354,11 +1359,12 @@ func TestScan_ConcurrencyBound(t *testing.T) {
 	})
 	assets := collectAssets(t, ch)
 
-	if peak > limit {
-		t.Errorf("并发峰值 = %d, 超过 worker pool 上限 %d", peak, limit)
-	}
-	if peak != limit {
-		t.Errorf("并发峰值 = %d, 期望 %d（4 个作业 + 2 个 worker 必定吃满）", peak, limit)
+	// peak 由 handler 协程用 atomic 累加，读取也必须走 atomic ——
+	// 直接读一个被其它协程原子修改的变量仍然是 data race（-race 会抓）。
+	if got := atomic.LoadInt32(&peak); got > limit {
+		t.Errorf("并发峰值 = %d, 超过 worker pool 上限 %d", got, limit)
+	} else if got != limit {
+		t.Errorf("并发峰值 = %d, 期望 %d（4 个作业 + 2 个 worker 必定吃满）", got, limit)
 	}
 	// 这个用例测的是 worker pool 的并发度，不是协议识别率：
 	// 4 个作业共用同一个假服务端，而它只会回 DNS 应答，
