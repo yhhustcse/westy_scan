@@ -52,8 +52,32 @@ jobs:
       - name: go build
         run: go build ./...
 
+      # 拆成"无竞态"和"带竞态"两步：一旦红了，能立刻区分是测试逻辑问题还是竞态检测特有
+      - name: go test（不含竞态）
+        shell: bash
+        run: go test ./... -count=1
+
       - name: go test（含竞态检测）
-        run: go test ./... -count=1 -race
+        shell: bash
+        run: |
+          log="${RUNNER_TEMP:-/tmp}/go-test-race.log"
+          if go test ./... -count=1 -race >"$log" 2>&1; then
+            tail -n 5 "$log"
+            exit 0
+          fi
+          # 失败时把关键行转成 **annotation**：
+          # job 日志需要账号鉴权才能读，而 check-run annotation 任何人都能读 ——
+          # 排查 CI 不应该先要权限。（顺带把环境打出来，省得再猜一轮。）
+          echo "--- 环境 ---"
+          go version
+          go env GOOS GOARCH CGO_ENABLED GOFLAGS GOMAXPROCS
+          echo "--- 失败摘要（同时会作为 annotation 出现在 UI 上）---"
+          grep -nE '^(--- FAIL|FAIL|panic:|# )|_test\.go:[0-9]+:' "$log" | tail -n 40 | while IFS= read -r line; do
+            echo "::error title=go test -race failed::$line"
+          done
+          echo "--- go test 日志尾部 60 行 ---"
+          tail -n 60 "$log"
+          exit 1
 
       - name: 构建单二进制
         run: go build -trimpath -ldflags "-s -w" -o bin/westy ./cmd/westy
