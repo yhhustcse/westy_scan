@@ -36,9 +36,11 @@ westy_scan 把这段流程做成一条**可解释、可审计、可扩展**的�
 **能力边界（当前版本）**：
 资产发现 + 端口/服务**协议级识别**（M1） + Web 探测（M2：favicon mmh3、CDN/WAF 被动识别、证书 SAN 联动）
 + 攻击面梳理（M3：robots/sitemap 入口、表单与参数清单、JS 接口与疑似凭据、页面去重）
-+ **只读漏洞验证**（M4：模板引擎、二次确认、OOB 外带、可复现证据）。
++ **只读漏洞验证**（M4：模板引擎、二次确认、OOB 外带、可复现证据）
++ 分布式 Server/Agent（M5） + 平台化（M6：RBAC/授权书/变更对比/报告/Web UI/通知/持久化）
++ 规则库与质量门禁（M7） + 工程化（M8：CI/覆盖率/缺陷修复）。
 **不做利用**：模板模型里根本没有执行命令/写文件/删数据的字段，破坏性动作用类型系统禁止。
-M5（分布式）、M6（平台化）尚未开始，见 `docs/EXECUTION_PLAN.md`。
+进度与验收详见 `docs/EXECUTION_PLAN.md`（M0–M8 全部交付，每节都带验收表与已知缺口）。
 
 ## 2. 快速开始
 
@@ -179,7 +181,7 @@ westy_scan/
 │   └── config/                   JSON 配置 + 参数校验
 ├── rules/fingerprint.json        外置指纹规则示例
 ├── configs/westy.example.json    配置示例（默认 authorized=false，防误用）
-├── docs/                         DESIGN / EXECUTION_PLAN / RULES / benchmark
+├── docs/                         DESIGN / EXECUTION_PLAN / RULES / CALIBRATION / benchmark
 └── scripts/                      find-go / build / test / verify / demo-local / demo-m1..m6 / demo-rules / fake-services.py
     └── rules-fixtures/           金丝雀夹具（模板 ↔ 靶站的契约，M7）
 ```
@@ -393,6 +395,8 @@ gofmt -l cmd internal    # 格式化检查（不要对仓库根跑，会走进 .
 > 覆盖率的提升路径（M8）：`agent` `ratelimit` `store` `audit` `sysinfo` `wire` `report` `notify`
 > `config` `model` 这 10 个包此前是 **0.0%**，靠一轮专项补测到现在的水平，
 > 并**在补测过程中抓出了 3 个真实缺陷**（见下）。
+
+真实目标校准记录见 `docs/CALIBRATION.md`（DVWA 实测：真阳性 2 / **误报 0** / 能力缺口 1，含已知答案对照表）。
 
 性能基准见 `docs/benchmark.md`：本机 connect 扫描 **31,368 ports/s**（1000 端口、并发 200，可复现）；
 该文档还给出了真实网络的吞吐推算模型（**限速几乎总是主导因素**）与
